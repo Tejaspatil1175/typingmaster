@@ -1,10 +1,29 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { TypingSimulator } from './components/TypingSimulator';
 import { cppSnippets } from './cppSnippets';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'practice'>('home');
-  const [selectedSnippetId, setSelectedSnippetId] = useState<string>('binary-search');
+  const [selectedSnippetId, setSelectedSnippetId] = useState<string>('arrays');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    cppSnippets.forEach((s) => set.add(s.category));
+    return ['All', ...Array.from(set)];
+  }, []);
+
+  const filteredSnippets = useMemo(() => {
+    return cppSnippets.filter((snippet) => {
+      const matchesSearch =
+        snippet.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        snippet.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        snippet.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = selectedCategory === 'All' || snippet.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [searchQuery, selectedCategory]);
 
   const navigateToSection = (sectionId: string) => {
     setCurrentPage('home');
@@ -17,15 +36,16 @@ function App() {
   };
 
   return (
-    <>
+    <div className="app-root-container">
       {/* Floating Navbar */}
       <nav className="navbar">
         <div className="nav-brand" onClick={() => setCurrentPage('home')} style={{ cursor: 'pointer' }}>
           <span>TypeDSA.cpp</span>
+          <span className="brand-count-badge">25 DSA Modules</span>
         </div>
         <div className="nav-links">
-          <a 
-            href="#practice" 
+          <a
+            href="#practice"
             className={`nav-link ${currentPage === 'practice' ? 'active' : ''}`}
             onClick={(e) => {
               e.preventDefault();
@@ -33,10 +53,10 @@ function App() {
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
           >
-            Practice
+            Practice Arena
           </a>
-          <a 
-            href="#advantages" 
+          <a
+            href="#advantages"
             className="nav-link"
             onClick={(e) => {
               e.preventDefault();
@@ -45,8 +65,8 @@ function App() {
           >
             Advantages
           </a>
-          <a 
-            href="#curriculum" 
+          <a
+            href="#curriculum"
             className="nav-link"
             onClick={(e) => {
               e.preventDefault();
@@ -55,9 +75,9 @@ function App() {
           >
             Curriculum
           </a>
-          <a 
-            href="https://github.com/Tejaspatil1175/typingmaster" 
-            target="_blank" 
+          <a
+            href="https://github.com/Tejaspatil1175/typingmaster"
+            target="_blank"
             rel="noopener noreferrer"
             className="btn-nav-cta"
           >
@@ -70,23 +90,23 @@ function App() {
         <>
           {/* Hero Section */}
           <header className="hero-section">
-            <span className="badge-tag">Interactive Coding Simulator</span>
+            <span className="badge-tag">Interactive C++ Coding Simulator</span>
             <h1 className="hero-title">
-              Master DSA in C++ <br />
+              Master 25 Core DSA Topics in C++ <br />
               <span>at the Speed of Thought</span>
             </h1>
             <p className="hero-subtitle">
-              Passive reading won't help you in time-pressured technical interviews. 
-              Build muscle memory for standard syntax, optimize your typing speed, 
-              and internalize algorithms by active coding practice.
+              Passive reading won't help you in time-pressured technical interviews.
+              Build muscle memory for standard syntax, optimize your typing speed,
+              and internalize algorithms by active coding practice across 25 essential data structures.
             </p>
             <div style={{ marginTop: '32px' }}>
-              <button 
+              <button
                 onClick={() => {
                   setCurrentPage('practice');
-                  setSelectedSnippetId('binary-search');
+                  setSelectedSnippetId('arrays');
                   window.scrollTo({ top: 0, behavior: 'auto' });
-                }} 
+                }}
                 className="btn-hero-cta"
               >
                 Start Typing Practice
@@ -95,46 +115,43 @@ function App() {
           </header>
 
           {/* Advantages Section */}
-          <section id="advantages" style={{ padding: '80px 0 40px' }}>
+          <section id="advantages" style={{ padding: '60px 20px 40px' }}>
             <h2 className="section-title">
               Why Practice <span>DSA via Speed Typing</span>?
             </h2>
             <div className="advantages-grid">
-              {/* Card 1 */}
               <div className="advantage-card">
                 <div className="advantage-icon-wrapper">
                   <span>🧠</span>
                 </div>
                 <h3>Syntax Autopilot</h3>
                 <p>
-                  Automate writing boilerplate code like <code>#include &lt;vector&gt;</code>, 
-                  custom pointer allocations, iterators, and class templates. Free up your 
+                  Automate writing boilerplate code like <code>#include &lt;vector&gt;</code>,
+                  pointer allocations, iterators, and class templates. Free up your
                   brain to focus on core algorithmic problem-solving.
                 </p>
               </div>
 
-              {/* Card 2 */}
               <div className="advantage-card">
                 <div className="advantage-icon-wrapper">
                   <span>⏱️</span>
                 </div>
                 <h3>Ace Coding Interviews</h3>
                 <p>
-                  In a 45-minute technical interview, typing speed is your secret superpower. 
-                  Reduce your execution phase to 10 minutes so you have more time to explain, 
+                  In a 45-minute technical interview, typing speed is your secret superpower.
+                  Reduce your execution phase to 10 minutes so you have more time to explain,
                   dry-run test-cases, and optimize complexity.
                 </p>
               </div>
 
-              {/* Card 3 */}
               <div className="advantage-card">
                 <div className="advantage-icon-wrapper">
                   <span>💾</span>
                 </div>
-                <h3>Cognitive Retention</h3>
+                <h3>Kinetic Retention</h3>
                 <p>
-                  Kinetic memory (typing) keeps your brain actively engaged. Re-typing algorithms 
-                  helps you memorize DFS, BFS, dynamic programming traversals, and tree mutations 
+                  Kinetic memory (typing) keeps your brain actively engaged. Re-typing algorithms
+                  helps you memorize DFS, BFS, dynamic programming traversals, and tree mutations
                   much faster than reading static slides.
                 </p>
               </div>
@@ -144,43 +161,31 @@ function App() {
           {/* Curriculum Roadmap */}
           <section id="curriculum" className="roadmap-section">
             <h2 className="section-title">
-              The <span>C++ DSA Path</span>
+              The <span>25 C++ DSA Modules</span>
             </h2>
             <div className="roadmap-timeline">
               <div className="roadmap-step">
-                <span className="step-num">Step 01</span>
-                <h4>Standard Template Library (STL)</h4>
-                <p>
-                  Master fast declarations of <code>std::vector</code>, <code>std::unordered_map</code>, 
-                  queues, stacks, and complex sorting lambdas.
-                </p>
+                <span className="step-num">Module 01</span>
+                <h4>Linear & Core Structures</h4>
+                <p>Arrays, Strings, Recursion, Sorting, Searching, Linked Lists, Stacks, Queues, and Deques.</p>
               </div>
 
               <div className="roadmap-step">
-                <span className="step-num">Step 02</span>
-                <h4>Linear Structures & Pointers</h4>
-                <p>
-                  Build muscle memory for writing singly/doubly linked list nodes, pointer operations, 
-                  and memory cleanup procedures.
-                </p>
+                <span className="step-num">Module 02</span>
+                <h4>Algorithmic Techniques</h4>
+                <p>Hashing, Two Pointers, Sliding Window, Prefix Sum, and Bit Manipulation tricks.</p>
               </div>
 
               <div className="roadmap-step">
-                <span className="step-num">Step 03</span>
-                <h4>Non-Linear Graph traversals</h4>
-                <p>
-                  Quickly lay out graph representations (Adjacency Lists), Breadth First Search (BFS), 
-                  Depth First Search (DFS), and trees.
-                </p>
+                <span className="step-num">Module 03</span>
+                <h4>Trees & Graph Systems</h4>
+                <p>Binary Trees, BST, Heaps (Priority Queues), Tries, and Dijkstra's Shortest Path.</p>
               </div>
 
               <div className="roadmap-step">
-                <span className="step-num">Step 04</span>
-                <h4>Dynamic Programming Templates</h4>
-                <p>
-                  Implement standard dynamic programming grids, memoization checks, and state transitions 
-                  without syntax stutter.
-                </p>
+                <span className="step-num">Module 04</span>
+                <h4>Advanced Engineering</h4>
+                <p>Greedy, Backtracking, DP Tabulation, Segment Trees, Fenwick Trees, and DSU Disjoint Sets.</p>
               </div>
             </div>
           </section>
@@ -189,25 +194,48 @@ function App() {
         /* Practice Page */
         <main className="practice-page-container">
           <div className="practice-header">
-            <button 
-              onClick={() => setCurrentPage('home')} 
+            <button
+              onClick={() => setCurrentPage('home')}
               className="btn-back"
             >
               ← Back to Home
             </button>
             <h1 className="practice-title">DSA Practice Arena</h1>
-            <p className="practice-subtitle">Choose any standard C++ algorithm card below to launch it inside the interactive typing speed visualizer.</p>
+            <p className="practice-subtitle">
+              Select any of the 25 standard C++ data structure & algorithm cards below to launch it inside the typing visualizer.
+            </p>
           </div>
 
-          {/* Expanded List of DSA Selector Cards */}
+          {/* Search & Category Filter Controls */}
+          <div className="arena-filter-controls">
+            <input
+              type="text"
+              className="arena-search-input"
+              placeholder="🔍 Search across 25 DSA topics (e.g. DP, Trie, Graph, Heap, Sorting...)"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <div className="category-pills">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  className={`pill-btn ${selectedCategory === cat ? 'active' : ''}`}
+                  onClick={() => setSelectedCategory(cat)}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 25 Selector Cards Grid */}
           <div className="topic-cards-grid">
-            {cppSnippets.map((snippet) => (
-              <div 
+            {filteredSnippets.map((snippet) => (
+              <div
                 key={snippet.id}
                 className={`topic-card ${selectedSnippetId === snippet.id ? 'active' : ''}`}
                 onClick={() => {
                   setSelectedSnippetId(snippet.id);
-                  // Optional scroll to the simulator when selecting a card on mobile
                   document.getElementById('simulator-anchor')?.scrollIntoView({ behavior: 'smooth' });
                 }}
               >
@@ -219,10 +247,15 @@ function App() {
                 </div>
                 <h4>{snippet.title}</h4>
                 <p>{snippet.description}</p>
+                <div className="card-complexity-footer">
+                  <span>⚡ {snippet.complexity.time}</span>
+                  <span>💾 {snippet.complexity.space}</span>
+                </div>
               </div>
             ))}
           </div>
-          
+
+          {/* Simulator Anchor */}
           <div id="simulator-anchor" style={{ width: '100%' }}>
             <TypingSimulator selectedSnippetId={selectedSnippetId} />
           </div>
@@ -232,15 +265,15 @@ function App() {
       {/* Footer */}
       <footer className="footer">
         <div>
-          <p>© {new Date().getFullYear()} TypeDSA.cpp. Built for C++ Developers.</p>
+          <p>© {new Date().getFullYear()} TypeDSA.cpp. 25 Essential C++ Algorithms & Data Structures.</p>
         </div>
         <div className="footer-links">
           <a href="https://github.com/Tejaspatil1175/typingmaster" target="_blank" rel="noopener noreferrer">
-            GitHub Repo
+            GitHub Repository
           </a>
         </div>
       </footer>
-    </>
+    </div>
   );
 }
 
