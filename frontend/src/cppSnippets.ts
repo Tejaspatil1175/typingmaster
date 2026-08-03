@@ -22,12 +22,15 @@ export const cppSnippets: CppSnippet[] = [
       time: 'O(N)',
       space: 'O(1)'
     },
-    code: `int maxSubArray(int arr[], int n) {
-    int maxSoFar = arr[0];
-    int currMax = arr[0];
-    for (int i = 1; i < n; i++) {
-        currMax = max(arr[i], currMax + arr[i]);
-        maxSoFar = max(maxSoFar, currMax);
+    code: `#include <vector>
+#include <algorithm>
+
+int maxSubArray(std::vector<int>& nums) {
+    int maxSoFar = nums[0];
+    int currMax = nums[0];
+    for (size_t i = 1; i < nums.size(); i++) {
+        currMax = std::max(nums[i], currMax + nums[i]);
+        maxSoFar = std::max(maxSoFar, currMax);
     }
     return maxSoFar;
 }`
@@ -42,7 +45,10 @@ export const cppSnippets: CppSnippet[] = [
       time: 'O(N)',
       space: 'O(1)'
     },
-    code: `bool isPalindrome(string s) {
+    code: `#include <string>
+#include <cctype>
+
+bool isPalindrome(std::string s) {
     int left = 0, right = s.length() - 1;
     while (left < right) {
         while (left < right && !isalnum(s[left])) left++;
@@ -65,10 +71,12 @@ export const cppSnippets: CppSnippet[] = [
       time: 'O(2^N)',
       space: 'O(N)'
     },
-    code: `void towerOfHanoi(int n, char fromPeg, char toPeg, char auxPeg) {
+    code: `#include <iostream>
+
+void towerOfHanoi(int n, char fromPeg, char toPeg, char auxPeg) {
     if (n == 0) return;
     towerOfHanoi(n - 1, fromPeg, auxPeg, toPeg);
-    cout << "Move disk " << n << " from " << fromPeg << " to " << toPeg << endl;
+    std::cout << "Move disk " << n << " from " << fromPeg << " to " << toPeg << "\\n";
     towerOfHanoi(n - 1, auxPeg, toPeg, fromPeg);
 }`
   },
@@ -82,20 +90,23 @@ export const cppSnippets: CppSnippet[] = [
       time: 'O(N log N)',
       space: 'O(log N)'
     },
-    code: `int partition(int arr[], int low, int high) {
+    code: `#include <vector>
+#include <algorithm>
+
+int partition(std::vector<int>& arr, int low, int high) {
     int pivot = arr[high];
     int i = (low - 1);
     for (int j = low; j <= high - 1; j++) {
         if (arr[j] < pivot) {
             i++;
-            swap(arr[i], arr[j]);
+            std::swap(arr[i], arr[j]);
         }
     }
-    swap(arr[i + 1], arr[high]);
+    std::swap(arr[i + 1], arr[high]);
     return (i + 1);
 }
 
-void quickSort(int arr[], int low, int high) {
+void quickSort(std::vector<int>& arr, int low, int high) {
     if (low < high) {
         int pi = partition(arr, low, high);
         quickSort(arr, low, pi - 1);
@@ -113,15 +124,15 @@ void quickSort(int arr[], int low, int high) {
       time: 'O(log N)',
       space: 'O(1)'
     },
-    code: `int binarySearch(int arr[], int l, int r, int x) {
+    code: `#include <vector>
+
+int binarySearch(const std::vector<int>& arr, int target) {
+    int l = 0, r = arr.size() - 1;
     while (l <= r) {
         int m = l + (r - l) / 2;
-        if (arr[m] == x)
-            return m;
-        if (arr[m] < x)
-            l = m + 1;
-        else
-            r = m - 1;
+        if (arr[m] == target) return m;
+        if (arr[m] < target) l = m + 1;
+        else r = m - 1;
     }
     return -1;
 }`
@@ -136,7 +147,12 @@ void quickSort(int arr[], int low, int high) {
       time: 'O(N)',
       space: 'O(1)'
     },
-    code: `Node* reverseList(Node* head) {
+    code: `struct Node {
+    int val;
+    Node* next;
+};
+
+Node* reverseList(Node* head) {
     Node* prev = nullptr;
     Node* curr = head;
     while (curr != nullptr) {
@@ -158,8 +174,11 @@ void quickSort(int arr[], int low, int high) {
       time: 'O(N)',
       space: 'O(N)'
     },
-    code: `bool isValidParentheses(string s) {
-    stack<char> st;
+    code: `#include <stack>
+#include <string>
+
+bool isValidParentheses(std::string s) {
+    std::stack<char> st;
     for (char c : s) {
         if (c == '(' || c == '{' || c == '[') st.push(c);
         else {
@@ -183,14 +202,17 @@ void quickSort(int arr[], int low, int high) {
       time: 'O(N)',
       space: 'O(W)'
     },
-    code: `void levelOrder(Node* root) {
+    code: `#include <queue>
+#include <iostream>
+
+void levelOrder(Node* root) {
     if (root == nullptr) return;
-    queue<Node*> q;
+    std::queue<Node*> q;
     q.push(root);
     while (!q.empty()) {
         Node* curr = q.front();
         q.pop();
-        cout << curr->val << " ";
+        std::cout << curr->val << " ";
         if (curr->left) q.push(curr->left);
         if (curr->right) q.push(curr->right);
     }
@@ -206,14 +228,17 @@ void quickSort(int arr[], int low, int high) {
       time: 'O(N)',
       space: 'O(K)'
     },
-    code: `vector<int> maxSlidingWindow(vector<int>& nums, int k) {
-    deque<int> dq;
-    vector<int> result;
-    for (int i = 0; i < nums.size(); i++) {
-        if (!dq.empty() && dq.front() == i - k) dq.pop_front();
+    code: `#include <vector>
+#include <deque>
+
+std::vector<int> maxSlidingWindow(std::vector<int>& nums, int k) {
+    std::deque<int> dq;
+    std::vector<int> result;
+    for (size_t i = 0; i < nums.size(); i++) {
+        if (!dq.empty() && dq.front() == (int)i - k) dq.pop_front();
         while (!dq.empty() && nums[dq.back()] <= nums[i]) dq.pop_back();
         dq.push_back(i);
-        if (i >= k - 1) result.push_back(nums[dq.front()]);
+        if ((int)i >= k - 1) result.push_back(nums[dq.front()]);
     }
     return result;
 }`
@@ -228,9 +253,12 @@ void quickSort(int arr[], int low, int high) {
       time: 'O(N)',
       space: 'O(N)'
     },
-    code: `vector<int> twoSum(vector<int>& nums, int target) {
-    unordered_map<int, int> mp;
-    for (int i = 0; i < nums.size(); i++) {
+    code: `#include <vector>
+#include <unordered_map>
+
+std::vector<int> twoSum(std::vector<int>& nums, int target) {
+    std::unordered_map<int, int> mp;
+    for (int i = 0; i < (int)nums.size(); i++) {
         int comp = target - nums[i];
         if (mp.count(comp)) {
             return {mp[comp], i};
@@ -250,13 +278,16 @@ void quickSort(int arr[], int low, int high) {
       time: 'O(N)',
       space: 'O(1)'
     },
-    code: `int maxArea(vector<int>& height) {
+    code: `#include <vector>
+#include <algorithm>
+
+int maxArea(std::vector<int>& height) {
     int maxWater = 0;
     int left = 0, right = height.size() - 1;
     while (left < right) {
         int w = right - left;
-        int h = min(height[left], height[right]);
-        maxWater = max(maxWater, w * h);
+        int h = std::min(height[left], height[right]);
+        maxWater = std::max(maxWater, w * h);
         if (height[left] < height[right]) left++;
         else right--;
     }
@@ -273,13 +304,16 @@ void quickSort(int arr[], int low, int high) {
       time: 'O(N)',
       space: 'O(1)'
     },
-    code: `int maxSubarraySumK(vector<int>& arr, int k) {
+    code: `#include <vector>
+#include <algorithm>
+
+int maxSubarraySumK(std::vector<int>& arr, int k) {
     int windowSum = 0;
     for (int i = 0; i < k; i++) windowSum += arr[i];
     int maxSum = windowSum;
-    for (int i = k; i < arr.size(); i++) {
+    for (size_t i = k; i < arr.size(); i++) {
         windowSum += arr[i] - arr[i - k];
-        maxSum = max(maxSum, windowSum);
+        maxSum = std::max(maxSum, windowSum);
     }
     return maxSum;
 }`
@@ -294,12 +328,14 @@ void quickSort(int arr[], int low, int high) {
       time: 'O(1) query',
       space: 'O(N)'
     },
-    code: `class NumArray {
-    vector<int> prefix;
+    code: `#include <vector>
+
+class NumArray {
+    std::vector<int> prefix;
 public:
-    NumArray(vector<int>& nums) {
+    NumArray(std::vector<int>& nums) {
         prefix.resize(nums.size() + 1, 0);
-        for (int i = 0; i < nums.size(); i++) {
+        for (size_t i = 0; i < nums.size(); i++) {
             prefix[i + 1] = prefix[i] + nums[i];
         }
     }
@@ -318,7 +354,9 @@ public:
       time: 'O(N)',
       space: 'O(1)'
     },
-    code: `int singleNumber(vector<int>& nums) {
+    code: `#include <vector>
+
+int singleNumber(std::vector<int>& nums) {
     int uniqueVal = 0;
     for (int num : nums) {
         uniqueVal ^= num;
@@ -345,11 +383,13 @@ int countSetBits(int n) {
       time: 'O(N)',
       space: 'O(H)'
     },
-    code: `void inorder(TreeNode* root) {
+    code: `#include <iostream>
+
+void inorder(TreeNode* root) {
     if (root == nullptr)
         return;
     inorder(root->left);
-    cout << root->val << " ";
+    std::cout << root->val << " ";
     inorder(root->right);
 }`
   },
@@ -386,11 +426,14 @@ TreeNode* searchBST(TreeNode* root, int val) {
       time: 'O(N log K)',
       space: 'O(K)'
     },
-    code: `int findKthLargest(vector<int>& nums, int k) {
-    priority_queue<int, vector<int>, greater<int>> minHeap;
+    code: `#include <vector>
+#include <queue>
+
+int findKthLargest(std::vector<int>& nums, int k) {
+    std::priority_queue<int, std::vector<int>, std::greater<int>> minHeap;
     for (int num : nums) {
         minHeap.push(num);
-        if (minHeap.size() > k) {
+        if ((int)minHeap.size() > k) {
             minHeap.pop();
         }
     }
@@ -407,15 +450,18 @@ TreeNode* searchBST(TreeNode* root, int val) {
       time: 'O(L)',
       space: 'O(N * L)'
     },
-    code: `class Trie {
+    code: `#include <string>
+#include <unordered_map>
+
+class Trie {
     struct TrieNode {
-        unordered_map<char, TrieNode*> children;
+        std::unordered_map<char, TrieNode*> children;
         bool isEndOfWord = false;
     };
     TrieNode* root;
 public:
     Trie() { root = new TrieNode(); }
-    void insert(string word) {
+    void insert(std::string word) {
         TrieNode* curr = root;
         for (char ch : word) {
             if (!curr->children.count(ch)) curr->children[ch] = new TrieNode();
@@ -423,7 +469,7 @@ public:
         }
         curr->isEndOfWord = true;
     }
-    bool search(string word) {
+    bool search(std::string word) {
         TrieNode* curr = root;
         for (char ch : word) {
             if (!curr->children.count(ch)) return false;
@@ -443,9 +489,13 @@ public:
       time: 'O((V + E) log V)',
       space: 'O(V + E)'
     },
-    code: `vector<int> dijkstra(int V, vector<vector<pair<int, int>>>& adj, int src) {
-    vector<int> dist(V, INT_MAX);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    code: `#include <vector>
+#include <queue>
+#include <climits>
+
+std::vector<int> dijkstra(int V, std::vector<std::vector<std::pair<int, int>>>& adj, int src) {
+    std::vector<int> dist(V, INT_MAX);
+    std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, std::greater<std::pair<int, int>>> pq;
     dist[src] = 0;
     pq.push({0, src});
     while (!pq.empty()) {
@@ -473,10 +523,13 @@ public:
       time: 'O(N log N)',
       space: 'O(1)'
     },
-    code: `struct Activity { int start, finish; };
+    code: `#include <vector>
+#include <algorithm>
 
-int maxActivities(vector<Activity>& activities) {
-    sort(activities.begin(), activities.end(), [](const Activity& a, const Activity& b) {
+struct Activity { int start, finish; };
+
+int maxActivities(std::vector<Activity>& activities) {
+    std::sort(activities.begin(), activities.end(), [](const Activity& a, const Activity& b) {
         return a.finish < b.finish;
     });
     int count = 0, lastFinish = -1;
@@ -499,18 +552,20 @@ int maxActivities(vector<Activity>& activities) {
       time: 'O(2^N)',
       space: 'O(N)'
     },
-    code: `void backtrack(int start, vector<int>& nums, vector<int>& curr, vector<vector<int>>& result) {
+    code: `#include <vector>
+
+void backtrack(int start, std::vector<int>& nums, std::vector<int>& curr, std::vector<std::vector<int>>& result) {
     result.push_back(curr);
-    for (int i = start; i < nums.size(); i++) {
+    for (size_t i = start; i < nums.size(); i++) {
         curr.push_back(nums[i]);
         backtrack(i + 1, nums, curr, result);
         curr.pop_back();
     }
 }
 
-vector<vector<int>> subsets(vector<int>& nums) {
-    vector<vector<int>> result;
-    vector<int> curr;
+std::vector<std::vector<int>> subsets(std::vector<int>& nums) {
+    std::vector<std::vector<int>> result;
+    std::vector<int> curr;
     backtrack(0, nums, curr, result);
     return result;
 }`
@@ -525,12 +580,15 @@ vector<vector<int>> subsets(vector<int>& nums) {
       time: 'O(N * W)',
       space: 'O(N * W)'
     },
-    code: `int knapsack(int W, int wt[], int val[], int n) {
-    vector<vector<int>> dp(n + 1, vector<int>(W + 1, 0));
+    code: `#include <vector>
+#include <algorithm>
+
+int knapsack(int W, int wt[], int val[], int n) {
+    std::vector<std::vector<int>> dp(n + 1, std::vector<int>(W + 1, 0));
     for (int i = 1; i <= n; i++) {
         for (int w = 1; w <= W; w++) {
             if (wt[i - 1] <= w) {
-                dp[i][w] = max(val[i - 1] + dp[i - 1][w - wt[i - 1]], dp[i - 1][w]);
+                dp[i][w] = std::max(val[i - 1] + dp[i - 1][w - wt[i - 1]], dp[i - 1][w]);
             } else {
                 dp[i][w] = dp[i - 1][w];
             }
@@ -549,10 +607,12 @@ vector<vector<int>> subsets(vector<int>& nums) {
       time: 'O(log N)',
       space: 'O(4N)'
     },
-    code: `class SegmentTree {
-    vector<int> tree;
+    code: `#include <vector>
+
+class SegmentTree {
+    std::vector<int> tree;
     int n;
-    void build(vector<int>& arr, int node, int start, int end) {
+    void build(std::vector<int>& arr, int node, int start, int end) {
         if (start == end) { tree[node] = arr[start]; return; }
         int mid = (start + end) / 2;
         build(arr, 2 * node, start, mid);
@@ -560,7 +620,7 @@ vector<vector<int>> subsets(vector<int>& nums) {
         tree[node] = tree[2 * node] + tree[2 * node + 1];
     }
 public:
-    SegmentTree(vector<int>& arr) {
+    SegmentTree(std::vector<int>& arr) {
         n = arr.size();
         tree.resize(4 * n, 0);
         if (n > 0) build(arr, 1, 0, n - 1);
@@ -583,8 +643,10 @@ public:
       time: 'O(log N)',
       space: 'O(N)'
     },
-    code: `class FenwickTree {
-    vector<int> bit;
+    code: `#include <vector>
+
+class FenwickTree {
+    std::vector<int> bit;
     int n;
 public:
     FenwickTree(int n) : n(n), bit(n + 1, 0) {}
@@ -612,8 +674,10 @@ public:
       time: 'O(α(N))',
       space: 'O(N)'
     },
-    code: `class DSU {
-    vector<int> parent, rank;
+    code: `#include <vector>
+
+class DSU {
+    std::vector<int> parent, rank;
 public:
     DSU(int n) : parent(n), rank(n, 0) {
         for (int i = 0; i < n; i++) parent[i] = i;
@@ -625,7 +689,7 @@ public:
     bool unite(int i, int j) {
         int rootI = find(i), rootJ = find(j);
         if (rootI != rootJ) {
-            if (rank[rootI] < rank[rootJ]) swap(rootI, rootJ);
+            if (rank[rootI] < rank[rootJ]) std::swap(rootI, rootJ);
             parent[rootJ] = rootI;
             if (rank[rootI] == rank[rootJ]) rank[rootI]++;
             return true;

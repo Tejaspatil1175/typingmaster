@@ -143,28 +143,23 @@ export const TypingSimulator = ({ selectedSnippetId = 'arrays', isCompact = fals
 
   return (
     <div className={`typing-simulator-container ${isCompact ? 'compact' : ''}`}>
-      {/* Description Header */}
+      {/* Non-compact Controls & Description */}
       {!isCompact && (
-        <div className="snippet-desc-card">
-          <span className={`difficulty-badge ${snippet.difficulty.toLowerCase()}`}>
-            {snippet.difficulty}
-          </span>
-          <h3>{snippet.title}</h3>
-          <p>{snippet.description}</p>
-        </div>
-      )}
-
-      {isCompact && (
-        <div className="compact-sim-header">
-          <div className="compact-sim-title">
-            <span className="badge-tag-mini">Live Array Simulator</span>
-            <h4>Arrays (Kadane's Algorithm)</h4>
+        <>
+          <div className="simulator-controls" style={{ justifyContent: 'flex-end' }}>
+            <div className="snippet-complexity">
+              <span className="complexity-badge time">Time: <code>{snippet.complexity.time}</code></span>
+              <span className="complexity-badge space">Space: <code>{snippet.complexity.space}</code></span>
+            </div>
           </div>
-          <div className="snippet-complexity">
-            <span className="complexity-badge time">Time: <code>{snippet.complexity.time}</code></span>
-            <span className="complexity-badge space">Space: <code>{snippet.complexity.space}</code></span>
+          <div className="snippet-desc-card">
+            <span className={`difficulty-badge ${snippet.difficulty.toLowerCase()}`}>
+              {snippet.difficulty}
+            </span>
+            <h3>{snippet.title}</h3>
+            <p>{snippet.description}</p>
           </div>
-        </div>
+        </>
       )}
 
       {/* Stats Dashboard */}
@@ -214,7 +209,7 @@ export const TypingSimulator = ({ selectedSnippetId = 'arrays', isCompact = fals
             <span className="dot yellow"></span>
             <span className="dot green"></span>
           </div>
-          <span className="terminal-title">{snippet.title.toLowerCase().replace(/\s+/g, '_')}.cpp</span>
+          <span className="terminal-title">arrays.cpp</span>
           <span className="terminal-lang">C++</span>
         </div>
         <div className="terminal-body">
