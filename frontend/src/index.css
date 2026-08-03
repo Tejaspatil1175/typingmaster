@@ -360,37 +360,39 @@ html, body {
   color: var(--text-secondary);
 }
 
-/* Stats Dashboard */
+/* Stats Dashboard - Compact Pill Size */
 .stats-dashboard {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 20px;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
 .stat-box {
   background: #ffffff;
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  text-align: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+  padding: 6px 12px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
 .stat-label {
-  display: block;
-  font-size: 12px;
+  display: inline-block;
+  font-size: 11px;
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 4px;
   font-weight: 600;
 }
 
 .stat-value {
   font-family: var(--mono);
-  font-size: 28px;
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: 700;
   color: var(--accent-darkgreen);
 }
 
@@ -398,7 +400,7 @@ html, body {
   color: var(--incorrect) !important;
 }
 
-/* Code Terminal IDE */
+/* Code Terminal IDE - Expanded & Larger for Best Code View */
 .hidden-textarea {
   position: absolute;
   left: -9999px;
@@ -460,14 +462,14 @@ html, body {
 }
 
 .terminal-body {
-  padding: 20px;
-  max-height: 280px;
+  padding: 22px;
+  max-height: 480px;
   overflow-y: auto;
   position: relative;
 }
 
 .compact .terminal-body {
-  max-height: 230px;
+  max-height: 380px;
   overflow-y: auto;
 }
 
