@@ -1,9 +1,32 @@
 import { useState, useEffect, useRef } from 'react';
 import { cppSnippets } from '../cppSnippets';
 
-export const TypingSimulator = () => {
+interface TypingSimulatorProps {
+  selectedCategory?: string;
+}
+
+export const TypingSimulator = ({ selectedCategory = 'all' }: TypingSimulatorProps) => {
+  // Filter snippets based on selected category
+  const filteredSnippets = cppSnippets.filter(s => {
+    if (selectedCategory === 'all') return true;
+    if (selectedCategory === 'arrays') return s.category === 'Algorithms' || s.category === 'Sorting';
+    if (selectedCategory === 'lists') return s.category === 'Data Structures';
+    if (selectedCategory === 'graphs') return s.category === 'Graphs';
+    return false;
+  });
+
+  const fallbackSnippet = {
+    id: 'placeholder',
+    title: 'No Snippets Available',
+    category: 'Status',
+    difficulty: 'Easy' as const,
+    description: 'We are working on adding C++ templates for this topic. Check back soon!',
+    complexity: { time: 'N/A', space: 'N/A' },
+    code: '// Snippets coming soon! Stay tuned.'
+  };
+
   const [snippetIndex, setSnippetIndex] = useState(0);
-  const snippet = cppSnippets[snippetIndex];
+  const snippet = filteredSnippets[snippetIndex] || fallbackSnippet;
 
   const [input, setInput] = useState('');
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -17,10 +40,15 @@ export const TypingSimulator = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Reset when snippet changes
+  // Reset when snippet or category changes
   useEffect(() => {
     resetSimulator();
   }, [snippetIndex]);
+
+  useEffect(() => {
+    setSnippetIndex(0);
+    resetSimulator();
+  }, [selectedCategory]);
 
   // Handle timer
   useEffect(() => {
@@ -160,11 +188,15 @@ export const TypingSimulator = () => {
             onChange={(e) => setSnippetIndex(Number(e.target.value))}
             className="select-dropdown"
           >
-            {cppSnippets.map((s, idx) => (
-              <option key={s.id} value={idx}>
-                {s.category} — {s.title} ({s.difficulty})
-              </option>
-            ))}
+            {filteredSnippets.length === 0 ? (
+              <option value={0}>Coming Soon</option>
+            ) : (
+              filteredSnippets.map((s, idx) => (
+                <option key={s.id} value={idx}>
+                  {s.category} — {s.title} ({s.difficulty})
+                </option>
+              ))
+            )}
           </select>
         </div>
 

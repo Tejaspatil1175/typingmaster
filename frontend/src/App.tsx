@@ -3,6 +3,7 @@ import { TypingSimulator } from './components/TypingSimulator';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'practice'>('home');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   const navigateToSection = (sectionId: string) => {
     setCurrentPage('home');
@@ -82,6 +83,7 @@ function App() {
               <button 
                 onClick={() => {
                   setCurrentPage('practice');
+                  setSelectedCategory('all');
                   window.scrollTo({ top: 0, behavior: 'auto' });
                 }} 
                 className="btn-hero-cta"
@@ -193,9 +195,46 @@ function App() {
               ← Back to Home
             </button>
             <h1 className="practice-title">DSA Practice Arena</h1>
-            <p className="practice-subtitle">Select a snippet below, focus on the editor, and start typing. Practice makes perfect.</p>
+            <p className="practice-subtitle">Select a topic category below, choose a code snippet, and master C++ DSA syntax through speed-typing.</p>
           </div>
-          <TypingSimulator />
+
+          {/* Category Selection Cards */}
+          <div className="topic-cards-grid">
+            <div 
+              className={`topic-card ${selectedCategory === 'all' ? 'active' : ''}`}
+              onClick={() => setSelectedCategory('all')}
+            >
+              <span className="topic-icon">🌐</span>
+              <h4>Show All</h4>
+              <p>View all available algorithms and structural code snippets</p>
+            </div>
+            <div 
+              className={`topic-card ${selectedCategory === 'arrays' ? 'active' : ''}`}
+              onClick={() => setSelectedCategory('arrays')}
+            >
+              <span className="topic-icon">📊</span>
+              <h4>Array Patterns</h4>
+              <p>Search, Sort, and sequence manipulation algorithms</p>
+            </div>
+            <div 
+              className={`topic-card ${selectedCategory === 'lists' ? 'active' : ''}`}
+              onClick={() => setSelectedCategory('lists')}
+            >
+              <span className="topic-icon">🔗</span>
+              <h4>Linked Lists</h4>
+              <p>Reversals, node swapping, and pointer manipulation</p>
+            </div>
+            <div 
+              className={`topic-card ${selectedCategory === 'graphs' ? 'active' : ''}`}
+              onClick={() => setSelectedCategory('graphs')}
+            >
+              <span className="topic-icon">🌿</span>
+              <h4>Trees & Graphs</h4>
+              <p>Depth First Search, BFS, and graph representations</p>
+            </div>
+          </div>
+          
+          <TypingSimulator selectedCategory={selectedCategory} />
         </main>
       )}
 
