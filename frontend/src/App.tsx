@@ -60,21 +60,18 @@ function App() {
           <span className="brand-count-badge">25 DSA Modules</span>
         </div>
         <div className="nav-links">
-          <button
-            className={`nav-link-btn ${currentPage === 'practice' && !viewingArrayQuestions ? 'active' : ''}`}
-            onClick={() => {
+          <a
+            href="#practice"
+            className={`nav-link ${currentPage === 'practice' ? 'active' : ''}`}
+            onClick={(e) => {
+              e.preventDefault();
               setCurrentPage('practice');
               setViewingArrayQuestions(false);
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
           >
             Practice Arena
-          </button>
-          {viewingArrayQuestions && (
-            <button className="nav-link-btn active">
-              10 Array Questions
-            </button>
-          )}
+          </a>
           <a
             href="#advantages"
             className="nav-link"
