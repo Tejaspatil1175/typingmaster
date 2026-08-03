@@ -1,122 +1,151 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { TypingSimulator } from './components/TypingSimulator';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+      {/* Navigation */}
+      <nav className="navbar">
+        <div className="nav-brand">
+          <span>TypeDSA.cpp</span>
         </div>
+        <div className="nav-links">
+          <a href="#practice" className="nav-link">Practice</a>
+          <a href="#advantages" className="nav-link">Advantages</a>
+          <a href="#curriculum" className="nav-link">Curriculum</a>
+          <a 
+            href="https://github.com/Tejaspatil1175/typingmaster" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="btn-nav-cta"
+          >
+            GitHub
+          </a>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <header className="hero-section">
+        <span className="badge-tag">Interactive Coding Simulator</span>
+        <h1 className="hero-title">
+          Master DSA in C++ <br />
+          <span>at the Speed of Thought</span>
+        </h1>
+        <p className="hero-subtitle">
+          Passive reading won't help you in time-pressured technical interviews. 
+          Build muscle memory for standard syntax, optimize your typing speed, 
+          and internalize algorithms by active coding practice.
+        </p>
+      </header>
+
+      {/* Interactive Typing Simulator Playground */}
+      <main id="practice">
+        <TypingSimulator />
+      </main>
+
+      {/* Advantages Section */}
+      <section id="advantages" style={{ padding: '80px 0 40px' }}>
+        <h2 className="section-title">
+          Why Practice <span>DSA via Speed Typing</span>?
+        </h2>
+        <div className="advantages-grid">
+          {/* Card 1 */}
+          <div className="advantage-card">
+            <div className="advantage-icon-wrapper">
+              <span>🧠</span>
+            </div>
+            <h3>Syntax Autopilot</h3>
+            <p>
+              Automate writing boilerplate code like <code>#include &lt;vector&gt;</code>, 
+              custom pointer allocations, iterators, and class templates. Free up your 
+              brain to focus on core algorithmic problem-solving.
+            </p>
+          </div>
+
+          {/* Card 2 */}
+          <div className="advantage-card">
+            <div className="advantage-icon-wrapper">
+              <span>⏱️</span>
+            </div>
+            <h3>Ace Coding Interviews</h3>
+            <p>
+              In a 45-minute technical interview, typing speed is your secret superpower. 
+              Reduce your execution phase to 10 minutes so you have more time to explain, 
+              dry-run test-cases, and optimize complexity.
+            </p>
+          </div>
+
+          {/* Card 3 */}
+          <div className="advantage-card">
+            <div className="advantage-icon-wrapper">
+              <span>💾</span>
+            </div>
+            <h3>Cognitive Retention</h3>
+            <p>
+              Kinetic memory (typing) keeps your brain actively engaged. Re-typing algorithms 
+              helps you memorize DFS, BFS, dynamic programming traversals, and tree mutations 
+              much faster than reading static slides.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Curriculum Roadmap */}
+      <section id="curriculum" className="roadmap-section">
+        <h2 className="section-title">
+          The <span>C++ DSA Path</span>
+        </h2>
+        <div className="roadmap-timeline">
+          <div className="roadmap-step">
+            <span className="step-num">Step 01</span>
+            <h4>Standard Template Library (STL)</h4>
+            <p>
+              Master fast declarations of <code>std::vector</code>, <code>std::unordered_map</code>, 
+              queues, stacks, and complex sorting lambdas.
+            </p>
+          </div>
+
+          <div className="roadmap-step">
+            <span className="step-num">Step 02</span>
+            <h4>Linear Structures & Pointers</h4>
+            <p>
+              Build muscle memory for writing singly/doubly linked list nodes, pointer operations, 
+              and memory cleanup procedures.
+            </p>
+          </div>
+
+          <div className="roadmap-step">
+            <span className="step-num">Step 03</span>
+            <h4>Non-Linear Graph traversals</h4>
+            <p>
+              Quickly lay out graph representations (Adjacency Lists), Breadth First Search (BFS), 
+              Depth First Search (DFS), and trees.
+            </p>
+          </div>
+
+          <div className="roadmap-step">
+            <span className="step-num">Step 04</span>
+            <h4>Dynamic Programming Templates</h4>
+            <p>
+              Implement standard dynamic programming grids, memoization checks, and state transitions 
+              without syntax stutter.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="footer">
         <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
+          <p>© {new Date().getFullYear()} TypeDSA.cpp. Built for C++ Developers.</p>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+        <div className="footer-links">
+          <a href="https://github.com/Tejaspatil1175/typingmaster" target="_blank" rel="noopener noreferrer">
+            GitHub Repo
+          </a>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+      </footer>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
