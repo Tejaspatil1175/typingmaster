@@ -3,9 +3,10 @@ import { cppSnippets } from '../cppSnippets';
 
 interface TypingSimulatorProps {
   selectedSnippetId?: string;
+  isCompact?: boolean;
 }
 
-export const TypingSimulator = ({ selectedSnippetId = 'binary-search' }: TypingSimulatorProps) => {
+export const TypingSimulator = ({ selectedSnippetId = 'arrays', isCompact = false }: TypingSimulatorProps) => {
   const snippet = cppSnippets.find(s => s.id === selectedSnippetId) || cppSnippets[0];
 
   const [input, setInput] = useState('');
@@ -52,13 +53,11 @@ export const TypingSimulator = ({ selectedSnippetId = 'binary-search' }: TypingS
     setMistakes(0);
     if (textareaRef.current) {
       textareaRef.current.value = '';
-      textareaRef.current.focus();
     }
   };
 
   const calculateWpm = (currentInput: string, elapsedSeconds: number) => {
     if (elapsedSeconds <= 0) return;
-    // Standard: 5 characters = 1 word
     const words = currentInput.length / 5;
     const minutes = elapsedSeconds / 60;
     const currentWpm = Math.round(words / minutes);
@@ -69,12 +68,10 @@ export const TypingSimulator = ({ selectedSnippetId = 'binary-search' }: TypingS
     const val = e.target.value;
     if (isCompleted) return;
 
-    // Start timer on first keystroke
     if (!startTime && val.length > 0) {
       setStartTime(Date.now());
     }
 
-    // Check if mistake was made (if the newly added character doesn't match)
     if (val.length > input.length) {
       const lastCharIndex = val.length - 1;
       const expectedChar = snippet.code[lastCharIndex];
@@ -87,7 +84,6 @@ export const TypingSimulator = ({ selectedSnippetId = 'binary-search' }: TypingS
 
     setInput(val);
 
-    // Calculate accuracy
     if (val.length > 0) {
       let correctChars = 0;
       for (let i = 0; i < val.length; i++) {
@@ -101,7 +97,6 @@ export const TypingSimulator = ({ selectedSnippetId = 'binary-search' }: TypingS
       setAccuracy(100);
     }
 
-    // Check completion
     if (val.length === snippet.code.length) {
       setIsCompleted(true);
       const elapsed = startTime ? (Date.now() - startTime) / 1000 : 0;
@@ -116,25 +111,20 @@ export const TypingSimulator = ({ selectedSnippetId = 'binary-search' }: TypingS
     }
   };
 
-  // Render highlighted characters of the snippet
   const renderCode = () => {
     const code = snippet.code;
     return code.split('').map((char, index) => {
       let className = 'char';
       
       if (index < input.length) {
-        // Already typed
         className += input[index] === char ? ' char-correct' : ' char-incorrect';
       } else if (index === input.length) {
-        // Current cursor position
         className += ' char-current';
         if (focused) className += ' blink';
       } else {
-        // Upcoming characters
         className += ' char-upcoming';
       }
 
-      // Format special characters for rendering
       if (char === '\n') {
         return (
           <span key={index} className={className}>
@@ -152,31 +142,33 @@ export const TypingSimulator = ({ selectedSnippetId = 'binary-search' }: TypingS
   };
 
   return (
-    <div className="typing-simulator-container">
-      {/* Top Controls: Info & Complexity */}
-      <div className="simulator-controls" style={{ justifyContent: 'flex-end' }}>
-        {/* Complexity badges */}
-        <div className="snippet-complexity">
-          <span className="complexity-badge time">
-            Time: <code>{snippet.complexity.time}</code>
+    <div className={`typing-simulator-container ${isCompact ? 'compact' : ''}`}>
+      {/* Description Header */}
+      {!isCompact && (
+        <div className="snippet-desc-card">
+          <span className={`difficulty-badge ${snippet.difficulty.toLowerCase()}`}>
+            {snippet.difficulty}
           </span>
-          <span className="complexity-badge space">
-            Space: <code>{snippet.complexity.space}</code>
-          </span>
+          <h3>{snippet.title}</h3>
+          <p>{snippet.description}</p>
         </div>
-      </div>
+      )}
 
-      {/* Simulator Description Card */}
-      <div className="snippet-desc-card">
-        <span className={`difficulty-badge ${snippet.difficulty.toLowerCase()}`}>
-          {snippet.difficulty}
-        </span>
-        <h3>{snippet.title}</h3>
-        <p>{snippet.description}</p>
-      </div>
+      {isCompact && (
+        <div className="compact-sim-header">
+          <div className="compact-sim-title">
+            <span className="badge-tag-mini">Live Array Simulator</span>
+            <h4>Arrays (Kadane's Algorithm)</h4>
+          </div>
+          <div className="snippet-complexity">
+            <span className="complexity-badge time">Time: <code>{snippet.complexity.time}</code></span>
+            <span className="complexity-badge space">Space: <code>{snippet.complexity.space}</code></span>
+          </div>
+        </div>
+      )}
 
       {/* Stats Dashboard */}
-      <div className="stats-dashboard">
+      <div className={`stats-dashboard ${isCompact ? 'compact-stats' : ''}`}>
         <div className="stat-box">
           <span className="stat-label">WPM</span>
           <span className="stat-value">{wpm}</span>
@@ -195,7 +187,7 @@ export const TypingSimulator = ({ selectedSnippetId = 'binary-search' }: TypingS
         </div>
       </div>
 
-      {/* Hidden input to capture typing */}
+      {/* Hidden input */}
       <textarea
         ref={textareaRef}
         className="hidden-textarea"
@@ -222,7 +214,7 @@ export const TypingSimulator = ({ selectedSnippetId = 'binary-search' }: TypingS
             <span className="dot yellow"></span>
             <span className="dot green"></span>
           </div>
-          <span className="terminal-title">{snippet.title.toLowerCase().replace(/\\s+/g, '_')}.cpp</span>
+          <span className="terminal-title">{snippet.title.toLowerCase().replace(/\s+/g, '_')}.cpp</span>
           <span className="terminal-lang">C++</span>
         </div>
         <div className="terminal-body">

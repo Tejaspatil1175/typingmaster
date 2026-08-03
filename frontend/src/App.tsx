@@ -88,29 +88,35 @@ function App() {
 
       {currentPage === 'home' ? (
         <>
-          {/* Hero Section */}
-          <header className="hero-section">
-            <span className="badge-tag">Interactive C++ Coding Simulator</span>
-            <h1 className="hero-title">
-              Master 25 Core DSA Topics in C++ <br />
-              <span>at the Speed of Thought</span>
-            </h1>
-            <p className="hero-subtitle">
-              Passive reading won't help you in time-pressured technical interviews.
-              Build muscle memory for standard syntax, optimize your typing speed,
-              and internalize algorithms by active coding practice across 25 essential data structures.
-            </p>
-            <div style={{ marginTop: '32px' }}>
-              <button
-                onClick={() => {
-                  setCurrentPage('practice');
-                  setSelectedSnippetId('arrays');
-                  window.scrollTo({ top: 0, behavior: 'auto' });
-                }}
-                className="btn-hero-cta"
-              >
-                Start Typing Practice
-              </button>
+          {/* Hero Section with Split Layout: Text on Left, Live Array Simulator on Right */}
+          <header className="hero-section hero-split-layout">
+            <div className="hero-left-content">
+              <span className="badge-tag">Interactive C++ Coding Simulator</span>
+              <h1 className="hero-title">
+                Master 25 Core DSA Topics in C++ <br />
+                <span>at the Speed of Thought</span>
+              </h1>
+              <p className="hero-subtitle">
+                Passive reading won't help you in time-pressured technical interviews.
+                Build muscle memory for standard syntax, optimize your typing speed,
+                and internalize algorithms by active coding practice across 25 essential data structures.
+              </p>
+              <div style={{ marginTop: '28px', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => {
+                    setCurrentPage('practice');
+                    setSelectedSnippetId('arrays');
+                    window.scrollTo({ top: 0, behavior: 'auto' });
+                  }}
+                  className="btn-hero-cta"
+                >
+                  Start Typing Practice
+                </button>
+              </div>
+            </div>
+
+            <div className="hero-right-simulator">
+              <TypingSimulator selectedSnippetId="arrays" isCompact={true} />
             </div>
           </header>
 
