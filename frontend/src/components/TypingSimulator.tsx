@@ -19,12 +19,23 @@ export const TypingSimulator = ({ selectedSnippetId = 'arrays', isCompact = fals
   const [focused, setFocused] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const terminalBodyRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Reset when selected snippet changes
   useEffect(() => {
     resetSimulator();
   }, [selectedSnippetId]);
+
+  // Auto-scroll terminal body as user types
+  useEffect(() => {
+    if (terminalBodyRef.current) {
+      const currentEl = terminalBodyRef.current.querySelector('.char-current');
+      if (currentEl) {
+        currentEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    }
+  }, [input]);
 
   // Handle timer
   useEffect(() => {
@@ -53,6 +64,9 @@ export const TypingSimulator = ({ selectedSnippetId = 'arrays', isCompact = fals
     setMistakes(0);
     if (textareaRef.current) {
       textareaRef.current.value = '';
+    }
+    if (terminalBodyRef.current) {
+      terminalBodyRef.current.scrollTop = 0;
     }
   };
 
@@ -209,10 +223,10 @@ export const TypingSimulator = ({ selectedSnippetId = 'arrays', isCompact = fals
             <span className="dot yellow"></span>
             <span className="dot green"></span>
           </div>
-          <span className="terminal-title">arrays.cpp</span>
+          <span className="terminal-title">{snippet.id}.cpp</span>
           <span className="terminal-lang">C++</span>
         </div>
-        <div className="terminal-body">
+        <div className="terminal-body" ref={terminalBodyRef}>
           {!focused && input.length === 0 && (
             <div className="terminal-overlay">
               <p className="overlay-text">Click here to start typing!</p>

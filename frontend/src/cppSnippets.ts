@@ -16,23 +16,34 @@ export const cppSnippets: CppSnippet[] = [
     id: 'arrays',
     title: 'Arrays',
     category: 'Arrays',
-    difficulty: 'Medium',
-    description: 'Finds the contiguous subarray with the largest sum in an array of integers using Kadane\'s Algorithm.',
+    difficulty: 'Easy',
+    description: 'Reverses an array of integers in-place using two-pointer swapping.',
     complexity: {
       time: 'O(N)',
       space: 'O(1)'
     },
-    code: `#include <vector>
-#include <algorithm>
+    code: `#include <iostream>
+using namespace std;
 
-int maxSubArray(std::vector<int>& nums) {
-    int maxSoFar = nums[0];
-    int currMax = nums[0];
-    for (size_t i = 1; i < nums.size(); i++) {
-        currMax = std::max(nums[i], currMax + nums[i]);
-        maxSoFar = std::max(maxSoFar, currMax);
+int main() {
+    int arr[] = {1, 2, 3, 4, 5};
+    int n = 5;
+
+    int start = 0;
+    int end = n - 1;
+
+    while (start < end) {
+        swap(arr[start], arr[end]);
+        start++;
+        end--;
     }
-    return maxSoFar;
+
+    cout << "Reversed Array: ";
+    for (int i = 0; i < n; i++) {
+        cout << arr[i] << " ";
+    }
+
+    return 0;
 }`
   },
   {
@@ -40,78 +51,81 @@ int maxSubArray(std::vector<int>& nums) {
     title: 'Strings',
     category: 'Strings',
     difficulty: 'Easy',
-    description: 'Checks if a string is a palindrome after processing alphanumeric characters.',
+    description: 'Reverses a std::string in-place using character swapping.',
     complexity: {
       time: 'O(N)',
       space: 'O(1)'
     },
-    code: `#include <string>
-#include <cctype>
+    code: `#include <iostream>
+#include <string>
+using namespace std;
 
-bool isPalindrome(std::string s) {
-    int left = 0, right = s.length() - 1;
-    while (left < right) {
-        while (left < right && !isalnum(s[left])) left++;
-        while (left < right && !isalnum(s[right])) right--;
-        if (tolower(s[left]) != tolower(s[right]))
-            return false;
-        left++;
-        right--;
+int main() {
+    string str = "hello";
+    int n = str.length();
+
+    for (int i = 0; i < n / 2; i++) {
+        swap(str[i], str[n - i - 1]);
     }
-    return true;
+
+    cout << "Reversed String: " << str << endl;
+    return 0;
 }`
   },
   {
     id: 'recursion',
     title: 'Recursion',
     category: 'Recursion',
-    difficulty: 'Medium',
-    description: 'Classic recursive solution to move N disks between source and target pegs (Tower of Hanoi).',
+    difficulty: 'Easy',
+    description: 'Calculates the factorial of a number using a recursive base condition.',
     complexity: {
-      time: 'O(2^N)',
+      time: 'O(N)',
       space: 'O(N)'
     },
     code: `#include <iostream>
+using namespace std;
 
-void towerOfHanoi(int n, char fromPeg, char toPeg, char auxPeg) {
-    if (n == 0) return;
-    towerOfHanoi(n - 1, fromPeg, auxPeg, toPeg);
-    std::cout << "Move disk " << n << " from " << fromPeg << " to " << toPeg << "\\n";
-    towerOfHanoi(n - 1, auxPeg, toPeg, fromPeg);
+int factorial(int n) {
+    if (n <= 1) return 1;
+    return n * factorial(n - 1);
+}
+
+int main() {
+    int num = 5;
+    cout << "Factorial of " << num << " is: " << factorial(num) << endl;
+    return 0;
 }`
   },
   {
     id: 'sorting',
     title: 'Sorting',
     category: 'Sorting',
-    difficulty: 'Medium',
-    description: 'In-place divide-and-conquer QuickSort algorithm using Lomuto partition.',
+    difficulty: 'Easy',
+    description: 'Sorts an array of integers using the Bubble Sort algorithm.',
     complexity: {
-      time: 'O(N log N)',
-      space: 'O(log N)'
+      time: 'O(N^2)',
+      space: 'O(1)'
     },
-    code: `#include <vector>
-#include <algorithm>
+    code: `#include <iostream>
+using namespace std;
 
-int partition(std::vector<int>& arr, int low, int high) {
-    int pivot = arr[high];
-    int i = (low - 1);
-    for (int j = low; j <= high - 1; j++) {
-        if (arr[j] < pivot) {
-            i++;
-            std::swap(arr[i], arr[j]);
+int main() {
+    int arr[] = {64, 34, 25, 12, 22};
+    int n = 5;
+
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                swap(arr[j], arr[j + 1]);
+            }
         }
     }
-    std::swap(arr[i + 1], arr[high]);
-    return (i + 1);
-}
 
-void quickSort(std::vector<int>& arr, int low, int high) {
-    if (low < high) {
-        int pi = partition(arr, low, high);
-        quickSort(arr, low, pi - 1);
-        quickSort(arr, pi + 1, high);
+    cout << "Sorted Array: ";
+    for (int i = 0; i < n; i++) {
+        cout << arr[i] << " ";
     }
+    return 0;
 }`
   },
   {
@@ -119,22 +133,31 @@ void quickSort(std::vector<int>& arr, int low, int high) {
     title: 'Searching (Linear & Binary Search)',
     category: 'Searching',
     difficulty: 'Easy',
-    description: 'Efficient search algorithm on sorted arrays by halving search space.',
+    description: 'Performs binary search on a sorted integer array.',
     complexity: {
       time: 'O(log N)',
       space: 'O(1)'
     },
-    code: `#include <vector>
+    code: `#include <iostream>
+using namespace std;
 
-int binarySearch(const std::vector<int>& arr, int target) {
-    int l = 0, r = arr.size() - 1;
-    while (l <= r) {
-        int m = l + (r - l) / 2;
-        if (arr[m] == target) return m;
-        if (arr[m] < target) l = m + 1;
-        else r = m - 1;
+int main() {
+    int arr[] = {10, 20, 30, 40, 50};
+    int n = 5, target = 30;
+
+    int low = 0, high = n - 1, found = -1;
+    while (low <= high) {
+        int mid = low + (high - low) / 2;
+        if (arr[mid] == target) {
+            found = mid;
+            break;
+        }
+        if (arr[mid] < target) low = mid + 1;
+        else high = mid - 1;
     }
-    return -1;
+
+    cout << "Target found at index: " << found << endl;
+    return 0;
 }`
   },
   {
@@ -142,26 +165,39 @@ int binarySearch(const std::vector<int>& arr, int target) {
     title: 'Linked List',
     category: 'Linked List',
     difficulty: 'Easy',
-    description: 'Reverses pointer directions of nodes in-place in a singly linked list.',
+    description: 'Creates a singly linked list and reverses its pointer direction.',
     complexity: {
       time: 'O(N)',
       space: 'O(1)'
     },
-    code: `struct Node {
-    int val;
+    code: `#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
     Node* next;
+    Node(int val) : data(val), next(nullptr) {}
 };
 
-Node* reverseList(Node* head) {
+int main() {
+    Node* head = new Node(1);
+    head->next = new Node(2);
+    head->next->next = new Node(3);
+
     Node* prev = nullptr;
     Node* curr = head;
     while (curr != nullptr) {
-        Node* nextTemp = curr->next;
+        Node* nextNode = curr->next;
         curr->next = prev;
         prev = curr;
-        curr = nextTemp;
+        curr = nextNode;
     }
-    return prev;
+
+    cout << "Reversed List: ";
+    for (Node* temp = prev; temp != nullptr; temp = temp->next) {
+        cout << temp->data << " ";
+    }
+    return 0;
 }`
   },
   {
@@ -169,78 +205,82 @@ Node* reverseList(Node* head) {
     title: 'Stack',
     category: 'Stack',
     difficulty: 'Easy',
-    description: 'Validates matching bracket sequences using std::stack LIFO structure.',
+    description: 'Demonstrates push, top, and pop operations with std::stack.',
     complexity: {
-      time: 'O(N)',
+      time: 'O(1)',
       space: 'O(N)'
     },
-    code: `#include <stack>
-#include <string>
+    code: `#include <iostream>
+#include <stack>
+using namespace std;
 
-bool isValidParentheses(std::string s) {
-    std::stack<char> st;
-    for (char c : s) {
-        if (c == '(' || c == '{' || c == '[') st.push(c);
-        else {
-            if (st.empty()) return false;
-            char top = st.top();
-            st.pop();
-            if ((c == ')' && top != '(') || (c == '}' && top != '{') || (c == ']' && top != '['))
-                return false;
-        }
+int main() {
+    stack<int> st;
+    st.push(10);
+    st.push(20);
+    st.push(30);
+
+    cout << "Stack elements: ";
+    while (!st.empty()) {
+        cout << st.top() << " ";
+        st.pop();
     }
-    return st.empty();
+    return 0;
 }`
   },
   {
     id: 'queue',
     title: 'Queue',
     category: 'Queue',
-    difficulty: 'Medium',
-    description: 'Processes elements level-by-level using std::queue FIFO semantics.',
+    difficulty: 'Easy',
+    description: 'Demonstrates push, front, and pop FIFO operations with std::queue.',
     complexity: {
-      time: 'O(N)',
-      space: 'O(W)'
+      time: 'O(1)',
+      space: 'O(N)'
     },
-    code: `#include <queue>
-#include <iostream>
+    code: `#include <iostream>
+#include <queue>
+using namespace std;
 
-void levelOrder(Node* root) {
-    if (root == nullptr) return;
-    std::queue<Node*> q;
-    q.push(root);
+int main() {
+    queue<int> q;
+    q.push(100);
+    q.push(200);
+    q.push(300);
+
+    cout << "Queue elements: ";
     while (!q.empty()) {
-        Node* curr = q.front();
+        cout << q.front() << " ";
         q.pop();
-        std::cout << curr->val << " ";
-        if (curr->left) q.push(curr->left);
-        if (curr->right) q.push(curr->right);
     }
+    return 0;
 }`
   },
   {
     id: 'deque',
     title: 'Deque',
     category: 'Deque',
-    difficulty: 'Hard',
-    description: 'Monotonic double-ended queue tracking maximums in sub-array windows.',
+    difficulty: 'Easy',
+    description: 'Demonstrates double-ended queue insertion and iteration with std::deque.',
     complexity: {
-      time: 'O(N)',
-      space: 'O(K)'
+      time: 'O(1)',
+      space: 'O(N)'
     },
-    code: `#include <vector>
+    code: `#include <iostream>
 #include <deque>
+using namespace std;
 
-std::vector<int> maxSlidingWindow(std::vector<int>& nums, int k) {
-    std::deque<int> dq;
-    std::vector<int> result;
-    for (size_t i = 0; i < nums.size(); i++) {
-        if (!dq.empty() && dq.front() == (int)i - k) dq.pop_front();
-        while (!dq.empty() && nums[dq.back()] <= nums[i]) dq.pop_back();
-        dq.push_back(i);
-        if ((int)i >= k - 1) result.push_back(nums[dq.front()]);
+int main() {
+    deque<int> dq;
+    dq.push_back(10);
+    dq.push_front(5);
+    dq.push_back(15);
+
+    cout << "Deque elements: ";
+    for (int x : dq) {
+        cout << x << " ";
     }
-    return result;
+    return 0;
 }`
   },
   {
@@ -248,74 +288,82 @@ std::vector<int> maxSlidingWindow(std::vector<int>& nums, int k) {
     title: 'Hashing',
     category: 'Hashing',
     difficulty: 'Easy',
-    description: 'Uses std::unordered_map for O(1) hash lookups to locate target sum pair indices.',
+    description: 'Uses std::unordered_map for key-value pair insertions and lookups.',
     complexity: {
-      time: 'O(N)',
+      time: 'O(1) avg',
       space: 'O(N)'
     },
-    code: `#include <vector>
+    code: `#include <iostream>
 #include <unordered_map>
+using namespace std;
 
-std::vector<int> twoSum(std::vector<int>& nums, int target) {
-    std::unordered_map<int, int> mp;
-    for (int i = 0; i < (int)nums.size(); i++) {
-        int comp = target - nums[i];
-        if (mp.count(comp)) {
-            return {mp[comp], i};
-        }
-        mp[nums[i]] = i;
-    }
-    return {};
+int main() {
+    unordered_map<string, int> freq;
+    freq["apple"] = 3;
+    freq["banana"] = 5;
+
+    cout << "Apple count: " << freq["apple"] << endl;
+    return 0;
 }`
   },
   {
     id: 'two-pointers',
     title: 'Two Pointers',
     category: 'Two Pointers',
-    difficulty: 'Medium',
-    description: 'Shrinks left and right boundary pointers based on height constraints.',
+    difficulty: 'Easy',
+    description: 'Finds a target sum pair in a sorted array using left and right pointers.',
     complexity: {
       time: 'O(N)',
       space: 'O(1)'
     },
-    code: `#include <vector>
-#include <algorithm>
+    code: `#include <iostream>
+using namespace std;
 
-int maxArea(std::vector<int>& height) {
-    int maxWater = 0;
-    int left = 0, right = height.size() - 1;
+int main() {
+    int arr[] = {1, 2, 3, 4, 6};
+    int n = 5, target = 6;
+
+    int left = 0, right = n - 1;
     while (left < right) {
-        int w = right - left;
-        int h = std::min(height[left], height[right]);
-        maxWater = std::max(maxWater, w * h);
-        if (height[left] < height[right]) left++;
+        int sum = arr[left] + arr[right];
+        if (sum == target) {
+            cout << "Pair found: " << arr[left] << " + " << arr[right] << endl;
+            break;
+        }
+        if (sum < target) left++;
         else right--;
     }
-    return maxWater;
+    return 0;
 }`
   },
   {
     id: 'sliding-window',
     title: 'Sliding Window',
     category: 'Sliding Window',
-    difficulty: 'Easy',
-    description: 'Maintains a running sum across sliding window boundaries of fixed size K.',
+    difficulty: 'Medium',
+    description: 'Calculates the maximum sum subarray of fixed window size K.',
     complexity: {
       time: 'O(N)',
       space: 'O(1)'
     },
-    code: `#include <vector>
-#include <algorithm>
+    code: `#include <iostream>
+using namespace std;
 
-int maxSubarraySumK(std::vector<int>& arr, int k) {
+int main() {
+    int arr[] = {2, 1, 5, 1, 3, 2};
+    int n = 6, k = 3;
+
     int windowSum = 0;
     for (int i = 0; i < k; i++) windowSum += arr[i];
+
     int maxSum = windowSum;
-    for (size_t i = k; i < arr.size(); i++) {
+    for (int i = k; i < n; i++) {
         windowSum += arr[i] - arr[i - k];
-        maxSum = std::max(maxSum, windowSum);
+        maxSum = max(maxSum, windowSum);
     }
-    return maxSum;
+
+    cout << "Max sum of subarray size " << k << ": " << maxSum << endl;
+    return 0;
 }`
   },
   {
@@ -323,54 +371,55 @@ int maxSubarraySumK(std::vector<int>& arr, int k) {
     title: 'Prefix Sum',
     category: 'Prefix Sum',
     difficulty: 'Easy',
-    description: 'Precomputes cumulative sum arrays for instant O(1) range query evaluations.',
+    description: 'Computes cumulative sum array for O(1) range queries.',
     complexity: {
-      time: 'O(1) query',
+      time: 'O(N)',
       space: 'O(N)'
     },
-    code: `#include <vector>
+    code: `#include <iostream>
+using namespace std;
 
-class NumArray {
-    std::vector<int> prefix;
-public:
-    NumArray(std::vector<int>& nums) {
-        prefix.resize(nums.size() + 1, 0);
-        for (size_t i = 0; i < nums.size(); i++) {
-            prefix[i + 1] = prefix[i] + nums[i];
-        }
+int main() {
+    int arr[] = {10, 20, 30, 40, 50};
+    int n = 5;
+
+    int prefix[5];
+    prefix[0] = arr[0];
+    for (int i = 1; i < n; i++) {
+        prefix[i] = prefix[i - 1] + arr[i];
     }
-    int sumRange(int left, int right) {
-        return prefix[right + 1] - prefix[left];
+
+    cout << "Prefix Sum Array: ";
+    for (int i = 0; i < n; i++) {
+        cout << prefix[i] << " ";
     }
-};`
+    return 0;
+}`
   },
   {
     id: 'bit-manipulation',
     title: 'Bit Manipulation',
     category: 'Bit Manipulation',
     difficulty: 'Easy',
-    description: 'Uses XOR property (x ^ x = 0) and bitwise operations to detect unique numbers.',
+    description: 'Finds the single non-repeating element using bitwise XOR.',
     complexity: {
       time: 'O(N)',
       space: 'O(1)'
     },
-    code: `#include <vector>
+    code: `#include <iostream>
+using namespace std;
 
-int singleNumber(std::vector<int>& nums) {
+int main() {
+    int nums[] = {4, 1, 2, 1, 2};
+    int n = 5;
+
     int uniqueVal = 0;
-    for (int num : nums) {
-        uniqueVal ^= num;
+    for (int i = 0; i < n; i++) {
+        uniqueVal ^= nums[i];
     }
-    return uniqueVal;
-}
 
-int countSetBits(int n) {
-    int count = 0;
-    while (n > 0) {
-        n &= (n - 1);
-        count++;
-    }
-    return count;
+    cout << "Single Unique Number: " << uniqueVal << endl;
+    return 0;
 }`
   },
   {
@@ -378,19 +427,36 @@ int countSetBits(int n) {
     title: 'Binary Tree',
     category: 'Binary Tree',
     difficulty: 'Easy',
-    description: 'Recursive Left-Root-Right traversal implementation for Binary Trees.',
+    description: 'Constructs a simple binary tree and performs Inorder Traversal.',
     complexity: {
       time: 'O(N)',
       space: 'O(H)'
     },
     code: `#include <iostream>
+using namespace std;
+
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+};
 
 void inorder(TreeNode* root) {
-    if (root == nullptr)
-        return;
+    if (root == nullptr) return;
     inorder(root->left);
-    std::cout << root->val << " ";
+    cout << root->val << " ";
     inorder(root->right);
+}
+
+int main() {
+    TreeNode* root = new TreeNode(1);
+    root->left = new TreeNode(2);
+    root->right = new TreeNode(3);
+
+    cout << "Inorder Traversal: ";
+    inorder(root);
+    return 0;
 }`
   },
   {
@@ -398,46 +464,60 @@ void inorder(TreeNode* root) {
     title: 'Binary Search Tree (BST)',
     category: 'Binary Search Tree (BST)',
     difficulty: 'Medium',
-    description: 'Maintains ordered node invariant where left < root < right.',
+    description: 'Inserts nodes into a Binary Search Tree maintaining ordering invariant.',
     complexity: {
       time: 'O(log N)',
       space: 'O(H)'
     },
-    code: `TreeNode* insertBST(TreeNode* root, int val) {
-    if (!root) return new TreeNode(val);
-    if (val < root->val) root->left = insertBST(root->left, val);
-    else if (val > root->val) root->right = insertBST(root->right, val);
+    code: `#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* left;
+    Node* right;
+    Node(int val) : data(val), left(nullptr), right(nullptr) {}
+};
+
+Node* insertBST(Node* root, int val) {
+    if (root == nullptr) return new Node(val);
+    if (val < root->data) root->left = insertBST(root->left, val);
+    else root->right = insertBST(root->right, val);
     return root;
 }
 
-TreeNode* searchBST(TreeNode* root, int val) {
-    if (!root || root->val == val) return root;
-    if (val < root->val) return searchBST(root->left, val);
-    return searchBST(root->right, val);
+int main() {
+    Node* root = nullptr;
+    root = insertBST(root, 50);
+    insertBST(root, 30);
+    insertBST(root, 70);
+
+    cout << "Root of BST: " << root->data << endl;
+    return 0;
 }`
   },
   {
     id: 'heap',
     title: 'Heap (Priority Queue)',
     category: 'Heap (Priority Queue)',
-    difficulty: 'Medium',
-    description: 'Employs std::priority_queue min-heap for instant top K element tracking.',
+    difficulty: 'Easy',
+    description: 'Demonstrates max-heap priority queue operations in C++ STL.',
     complexity: {
-      time: 'O(N log K)',
-      space: 'O(K)'
+      time: 'O(log N)',
+      space: 'O(N)'
     },
-    code: `#include <vector>
+    code: `#include <iostream>
 #include <queue>
+using namespace std;
 
-int findKthLargest(std::vector<int>& nums, int k) {
-    std::priority_queue<int, std::vector<int>, std::greater<int>> minHeap;
-    for (int num : nums) {
-        minHeap.push(num);
-        if ((int)minHeap.size() > k) {
-            minHeap.pop();
-        }
-    }
-    return minHeap.top();
+int main() {
+    priority_queue<int> maxHeap;
+    maxHeap.push(10);
+    maxHeap.push(30);
+    maxHeap.push(20);
+
+    cout << "Top element of Heap: " << maxHeap.top() << endl;
+    return 0;
 }`
   },
   {
@@ -445,101 +525,89 @@ int findKthLargest(std::vector<int>& nums, int k) {
     title: 'Trie',
     category: 'Trie',
     difficulty: 'Medium',
-    description: 'Tree structure optimized for string insertion, search, and prefix matching.',
+    description: 'Constructs a Trie node structure and inserts a word string.',
     complexity: {
       time: 'O(L)',
       space: 'O(N * L)'
     },
-    code: `#include <string>
+    code: `#include <iostream>
 #include <unordered_map>
+using namespace std;
 
-class Trie {
-    struct TrieNode {
-        std::unordered_map<char, TrieNode*> children;
-        bool isEndOfWord = false;
-    };
-    TrieNode* root;
-public:
-    Trie() { root = new TrieNode(); }
-    void insert(std::string word) {
-        TrieNode* curr = root;
-        for (char ch : word) {
-            if (!curr->children.count(ch)) curr->children[ch] = new TrieNode();
-            curr = curr->children[ch];
-        }
-        curr->isEndOfWord = true;
+struct TrieNode {
+    unordered_map<char, TrieNode*> children;
+    bool isEnd = false;
+};
+
+int main() {
+    TrieNode* root = new TrieNode();
+    string word = "cat";
+
+    TrieNode* curr = root;
+    for (char c : word) {
+        if (!curr->children.count(c)) curr->children[c] = new TrieNode();
+        curr = curr->children[c];
     }
-    bool search(std::string word) {
-        TrieNode* curr = root;
-        for (char ch : word) {
-            if (!curr->children.count(ch)) return false;
-            curr = curr->children[ch];
-        }
-        return curr->isEndOfWord;
-    }
-};`
+    curr->isEnd = true;
+
+    cout << "Inserted word: " << word << endl;
+    return 0;
+}`
   },
   {
     id: 'graphs',
     title: 'Graphs',
     category: 'Graphs',
-    difficulty: 'Hard',
-    description: 'Calculates shortest distance from source on non-negative weighted graphs.',
+    difficulty: 'Medium',
+    description: 'Builds a basic adjacency list representation of a directed graph.',
     complexity: {
-      time: 'O((V + E) log V)',
+      time: 'O(V + E)',
       space: 'O(V + E)'
     },
-    code: `#include <vector>
-#include <queue>
-#include <climits>
+    code: `#include <iostream>
+#include <vector>
+using namespace std;
 
-std::vector<int> dijkstra(int V, std::vector<std::vector<std::pair<int, int>>>& adj, int src) {
-    std::vector<int> dist(V, INT_MAX);
-    std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, std::greater<std::pair<int, int>>> pq;
-    dist[src] = 0;
-    pq.push({0, src});
-    while (!pq.empty()) {
-        auto [d, u] = pq.top();
-        pq.pop();
-        if (d > dist[u]) continue;
-        for (auto& edge : adj[u]) {
-            int v = edge.first, weight = edge.second;
-            if (dist[u] + weight < dist[v]) {
-                dist[v] = dist[u] + weight;
-                pq.push({dist[v], v});
-            }
-        }
-    }
-    return dist;
+int main() {
+    int V = 3;
+    vector<int> adj[3];
+
+    adj[0].push_back(1);
+    adj[1].push_back(2);
+
+    cout << "Graph Adjacency List: Node 0 connected to " << adj[0][0] << endl;
+    return 0;
 }`
   },
   {
     id: 'greedy',
     title: 'Greedy Algorithms',
     category: 'Greedy Algorithms',
-    difficulty: 'Medium',
-    description: 'Selects max non-overlapping activities by greedy finish time sorting.',
+    difficulty: 'Easy',
+    description: 'Solves coin change problem greedily using sorted coin denominations.',
     complexity: {
-      time: 'O(N log N)',
+      time: 'O(N)',
       space: 'O(1)'
     },
-    code: `#include <vector>
+    code: `#include <iostream>
+#include <vector>
 #include <algorithm>
+using namespace std;
 
-struct Activity { int start, finish; };
+int main() {
+    vector<int> coins = {1, 2, 5, 10, 20, 50};
+    int amount = 43;
 
-int maxActivities(std::vector<Activity>& activities) {
-    std::sort(activities.begin(), activities.end(), [](const Activity& a, const Activity& b) {
-        return a.finish < b.finish;
-    });
-    int count = 0, lastFinish = -1;
-    for (const auto& act : activities) {
-        if (act.start >= lastFinish) {
+    int count = 0;
+    for (int i = coins.size() - 1; i >= 0; i--) {
+        while (amount >= coins[i]) {
+            amount -= coins[i];
             count++;
-            lastFinish = act.finish;
         }
     }
-    return count;
+
+    cout << "Min coins needed: " << count << endl;
+    return 0;
 }`
   },
   {
@@ -547,54 +615,56 @@ int maxActivities(std::vector<Activity>& activities) {
     title: 'Backtracking',
     category: 'Backtracking',
     difficulty: 'Medium',
-    description: 'Explores decisions by systematically building and undoing solution state vectors.',
+    description: 'Generates all binary strings of length N using recursive backtracking.',
     complexity: {
       time: 'O(2^N)',
       space: 'O(N)'
     },
-    code: `#include <vector>
+    code: `#include <iostream>
+#include <string>
+using namespace std;
 
-void backtrack(int start, std::vector<int>& nums, std::vector<int>& curr, std::vector<std::vector<int>>& result) {
-    result.push_back(curr);
-    for (size_t i = start; i < nums.size(); i++) {
-        curr.push_back(nums[i]);
-        backtrack(i + 1, nums, curr, result);
-        curr.pop_back();
+void generate(int n, string curr) {
+    if (curr.length() == n) {
+        cout << curr << " ";
+        return;
     }
+    generate(n, curr + "0");
+    generate(n, curr + "1");
 }
 
-std::vector<std::vector<int>> subsets(std::vector<int>& nums) {
-    std::vector<std::vector<int>> result;
-    std::vector<int> curr;
-    backtrack(0, nums, curr, result);
-    return result;
+int main() {
+    cout << "Binary Strings of length 2: ";
+    generate(2, "");
+    return 0;
 }`
   },
   {
     id: 'dynamic-programming',
     title: 'Dynamic Programming (DP)',
     category: 'Dynamic Programming (DP)',
-    difficulty: 'Hard',
-    description: 'Solves the classic knapsack capacity problem using bottom-up DP matrix.',
+    difficulty: 'Easy',
+    description: 'Calculates the Nth Fibonacci number using a bottom-up DP table.',
     complexity: {
-      time: 'O(N * W)',
-      space: 'O(N * W)'
+      time: 'O(N)',
+      space: 'O(N)'
     },
-    code: `#include <vector>
-#include <algorithm>
+    code: `#include <iostream>
+#include <vector>
+using namespace std;
 
-int knapsack(int W, int wt[], int val[], int n) {
-    std::vector<std::vector<int>> dp(n + 1, std::vector<int>(W + 1, 0));
-    for (int i = 1; i <= n; i++) {
-        for (int w = 1; w <= W; w++) {
-            if (wt[i - 1] <= w) {
-                dp[i][w] = std::max(val[i - 1] + dp[i - 1][w - wt[i - 1]], dp[i - 1][w]);
-            } else {
-                dp[i][w] = dp[i - 1][w];
-            }
-        }
+int main() {
+    int n = 6;
+    vector<int> dp(n + 1, 0);
+    dp[0] = 0;
+    dp[1] = 1;
+
+    for (int i = 2; i <= n; i++) {
+        dp[i] = dp[i - 1] + dp[i - 2];
     }
-    return dp[n][W];
+
+    cout << "6th Fibonacci Number: " << dp[n] << endl;
+    return 0;
 }`
   },
   {
@@ -602,100 +672,85 @@ int knapsack(int W, int wt[], int val[], int n) {
     title: 'Segment Tree',
     category: 'Segment Tree',
     difficulty: 'Hard',
-    description: 'Tree structure supporting logarithmic point updates and range aggregation queries.',
+    description: 'Builds a Segment Tree for fast range sum queries.',
     complexity: {
-      time: 'O(log N)',
+      time: 'O(N)',
       space: 'O(4N)'
     },
-    code: `#include <vector>
+    code: `#include <iostream>
+using namespace std;
 
-class SegmentTree {
-    std::vector<int> tree;
-    int n;
-    void build(std::vector<int>& arr, int node, int start, int end) {
-        if (start == end) { tree[node] = arr[start]; return; }
-        int mid = (start + end) / 2;
-        build(arr, 2 * node, start, mid);
-        build(arr, 2 * node + 1, mid + 1, end);
-        tree[node] = tree[2 * node] + tree[2 * node + 1];
-    }
-public:
-    SegmentTree(std::vector<int>& arr) {
-        n = arr.size();
-        tree.resize(4 * n, 0);
-        if (n > 0) build(arr, 1, 0, n - 1);
-    }
-    int query(int node, int start, int end, int l, int r) {
-        if (r < start || end < l) return 0;
-        if (l <= start && end <= r) return tree[node];
-        int mid = (start + end) / 2;
-        return query(2 * node, start, mid, l, r) + query(2 * node + 1, mid + 1, end, l, r);
-    }
-};`
+void build(int arr[], int tree[], int node, int start, int end) {
+    if (start == end) { tree[node] = arr[start]; return; }
+    int mid = (start + end) / 2;
+    build(arr, tree, 2 * node, start, mid);
+    build(arr, tree, 2 * node + 1, mid + 1, end);
+    tree[node] = tree[2 * node] + tree[2 * node + 1];
+}
+
+int main() {
+    int arr[] = {1, 2, 3, 4};
+    int tree[16] = {0};
+    build(arr, tree, 1, 0, 3);
+
+    cout << "Segment Tree Root Sum: " << tree[1] << endl;
+    return 0;
+}`
   },
   {
     id: 'fenwick-tree',
     title: 'Fenwick Tree (Binary Indexed Tree)',
     category: 'Fenwick Tree (Binary Indexed Tree)',
     difficulty: 'Hard',
-    description: 'Bitwise LSB indexed array structure for efficient prefix sum calculations.',
+    description: 'Updates a Binary Indexed Tree (BIT) using LSB index shifts.',
     complexity: {
       time: 'O(log N)',
       space: 'O(N)'
     },
-    code: `#include <vector>
+    code: `#include <iostream>
+using namespace std;
 
-class FenwickTree {
-    std::vector<int> bit;
-    int n;
-public:
-    FenwickTree(int n) : n(n), bit(n + 1, 0) {}
-    void add(int idx, int val) {
-        for (; idx <= n; idx += idx & -idx) {
-            bit[idx] += val;
-        }
+void update(int bit[], int n, int idx, int val) {
+    for (; idx <= n; idx += idx & -idx) {
+        bit[idx] += val;
     }
-    int query(int idx) {
-        int sum = 0;
-        for (; idx > 0; idx -= idx & -idx) {
-            sum += bit[idx];
-        }
-        return sum;
-    }
-};`
+}
+
+int main() {
+    int n = 5;
+    int bit[6] = {0};
+    update(bit, n, 1, 10);
+    update(bit, n, 2, 20);
+
+    cout << "BIT updated successfully!" << endl;
+    return 0;
+}`
   },
   {
     id: 'dsu',
     title: 'Disjoint Set Union (DSU)',
     category: 'Disjoint Set Union (DSU)',
     difficulty: 'Medium',
-    description: 'Manages dynamic set partitioning with near O(1) amortized inverse Ackermann time.',
+    description: 'Implements Disjoint Set Union with findParent path compression.',
     complexity: {
       time: 'O(α(N))',
       space: 'O(N)'
     },
-    code: `#include <vector>
+    code: `#include <iostream>
+using namespace std;
 
-class DSU {
-    std::vector<int> parent, rank;
-public:
-    DSU(int n) : parent(n), rank(n, 0) {
-        for (int i = 0; i < n; i++) parent[i] = i;
-    }
-    int find(int i) {
-        if (parent[i] == i) return i;
-        return parent[i] = find(parent[i]);
-    }
-    bool unite(int i, int j) {
-        int rootI = find(i), rootJ = find(j);
-        if (rootI != rootJ) {
-            if (rank[rootI] < rank[rootJ]) std::swap(rootI, rootJ);
-            parent[rootJ] = rootI;
-            if (rank[rootI] == rank[rootJ]) rank[rootI]++;
-            return true;
-        }
-        return false;
-    }
-};`
+int findParent(int i, int parent[]) {
+    if (parent[i] == i) return i;
+    return parent[i] = findParent(parent[i], parent);
+}
+
+int main() {
+    int parent[5];
+    for (int i = 0; i < 5; i++) parent[i] = i;
+
+    parent[1] = 0;
+    cout << "Parent of node 1 is: " << findParent(1, parent) << endl;
+    return 0;
+}`
   }
 ];
