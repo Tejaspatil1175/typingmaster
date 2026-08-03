@@ -139,12 +139,12 @@ function App() {
                 <button
                   onClick={() => {
                     setCurrentPage('practice');
-                    setViewingArrayQuestions(true);
+                    setViewingArrayQuestions(false);
                     window.scrollTo({ top: 0, behavior: 'auto' });
                   }}
                   className="btn-hero-cta"
                 >
-                  Explore Array Questions (10) →
+                  Start Typing Practice →
                 </button>
                 <button
                   onClick={() => {
