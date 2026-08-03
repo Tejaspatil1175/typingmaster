@@ -14,10 +14,10 @@ export interface CppSnippet {
 export const cppSnippets: CppSnippet[] = [
   {
     id: 'arrays',
-    title: 'Arrays (Kadane\'s Algorithm)',
+    title: 'Arrays',
     category: 'Arrays',
     difficulty: 'Medium',
-    description: 'Finds the contiguous subarray with the largest sum in an array of integers.',
+    description: 'Finds the contiguous subarray with the largest sum in an array of integers using Kadane\'s Algorithm.',
     complexity: {
       time: 'O(N)',
       space: 'O(1)'
@@ -34,7 +34,7 @@ export const cppSnippets: CppSnippet[] = [
   },
   {
     id: 'strings',
-    title: 'Strings (Valid Palindrome)',
+    title: 'Strings',
     category: 'Strings',
     difficulty: 'Easy',
     description: 'Checks if a string is a palindrome after processing alphanumeric characters.',
@@ -57,10 +57,10 @@ export const cppSnippets: CppSnippet[] = [
   },
   {
     id: 'recursion',
-    title: 'Recursion (Tower of Hanoi)',
+    title: 'Recursion',
     category: 'Recursion',
     difficulty: 'Medium',
-    description: 'Classic recursive solution to move N disks between source and target pegs.',
+    description: 'Classic recursive solution to move N disks between source and target pegs (Tower of Hanoi).',
     complexity: {
       time: 'O(2^N)',
       space: 'O(N)'
@@ -74,10 +74,10 @@ export const cppSnippets: CppSnippet[] = [
   },
   {
     id: 'sorting',
-    title: 'Sorting (QuickSort)',
+    title: 'Sorting',
     category: 'Sorting',
     difficulty: 'Medium',
-    description: 'In-place divide-and-conquer sorting algorithm using Lomuto partition.',
+    description: 'In-place divide-and-conquer QuickSort algorithm using Lomuto partition.',
     complexity: {
       time: 'O(N log N)',
       space: 'O(log N)'
@@ -105,7 +105,7 @@ void quickSort(int arr[], int low, int high) {
   },
   {
     id: 'searching',
-    title: 'Searching (Binary Search)',
+    title: 'Searching (Linear & Binary Search)',
     category: 'Searching',
     difficulty: 'Easy',
     description: 'Efficient search algorithm on sorted arrays by halving search space.',
@@ -128,7 +128,7 @@ void quickSort(int arr[], int low, int high) {
   },
   {
     id: 'linked-list',
-    title: 'Linked List (In-Place Reversal)',
+    title: 'Linked List',
     category: 'Linked List',
     difficulty: 'Easy',
     description: 'Reverses pointer directions of nodes in-place in a singly linked list.',
@@ -150,7 +150,7 @@ void quickSort(int arr[], int low, int high) {
   },
   {
     id: 'stack',
-    title: 'Stack (Valid Parentheses)',
+    title: 'Stack',
     category: 'Stack',
     difficulty: 'Easy',
     description: 'Validates matching bracket sequences using std::stack LIFO structure.',
@@ -175,7 +175,7 @@ void quickSort(int arr[], int low, int high) {
   },
   {
     id: 'queue',
-    title: 'Queue (Level Order Traversal)',
+    title: 'Queue',
     category: 'Queue',
     difficulty: 'Medium',
     description: 'Processes elements level-by-level using std::queue FIFO semantics.',
@@ -198,7 +198,7 @@ void quickSort(int arr[], int low, int high) {
   },
   {
     id: 'deque',
-    title: 'Deque (Sliding Window Maximum)',
+    title: 'Deque',
     category: 'Deque',
     difficulty: 'Hard',
     description: 'Monotonic double-ended queue tracking maximums in sub-array windows.',
@@ -220,7 +220,7 @@ void quickSort(int arr[], int low, int high) {
   },
   {
     id: 'hashing',
-    title: 'Hashing (Two Sum Problem)',
+    title: 'Hashing',
     category: 'Hashing',
     difficulty: 'Easy',
     description: 'Uses std::unordered_map for O(1) hash lookups to locate target sum pair indices.',
@@ -242,7 +242,7 @@ void quickSort(int arr[], int low, int high) {
   },
   {
     id: 'two-pointers',
-    title: 'Two Pointers (Container With Most Water)',
+    title: 'Two Pointers',
     category: 'Two Pointers',
     difficulty: 'Medium',
     description: 'Shrinks left and right boundary pointers based on height constraints.',
@@ -265,7 +265,7 @@ void quickSort(int arr[], int low, int high) {
   },
   {
     id: 'sliding-window',
-    title: 'Sliding Window (Max Sum Subarray K)',
+    title: 'Sliding Window',
     category: 'Sliding Window',
     difficulty: 'Easy',
     description: 'Maintains a running sum across sliding window boundaries of fixed size K.',
@@ -286,7 +286,7 @@ void quickSort(int arr[], int low, int high) {
   },
   {
     id: 'prefix-sum',
-    title: 'Prefix Sum (Range Sum Query)',
+    title: 'Prefix Sum',
     category: 'Prefix Sum',
     difficulty: 'Easy',
     description: 'Precomputes cumulative sum arrays for instant O(1) range query evaluations.',
@@ -310,7 +310,7 @@ public:
   },
   {
     id: 'bit-manipulation',
-    title: 'Bit Manipulation (Single Number & Set Bits)',
+    title: 'Bit Manipulation',
     category: 'Bit Manipulation',
     difficulty: 'Easy',
     description: 'Uses XOR property (x ^ x = 0) and bitwise operations to detect unique numbers.',
@@ -337,7 +337,7 @@ int countSetBits(int n) {
   },
   {
     id: 'binary-tree',
-    title: 'Binary Tree (Inorder Traversal)',
+    title: 'Binary Tree',
     category: 'Binary Tree',
     difficulty: 'Easy',
     description: 'Recursive Left-Root-Right traversal implementation for Binary Trees.',
@@ -355,7 +355,7 @@ int countSetBits(int n) {
   },
   {
     id: 'bst',
-    title: 'Binary Search Tree (BST Insert & Search)',
+    title: 'Binary Search Tree (BST)',
     category: 'Binary Search Tree (BST)',
     difficulty: 'Medium',
     description: 'Maintains ordered node invariant where left < root < right.',
@@ -378,7 +378,7 @@ TreeNode* searchBST(TreeNode* root, int val) {
   },
   {
     id: 'heap',
-    title: 'Heap (Priority Queue Top K)',
+    title: 'Heap (Priority Queue)',
     category: 'Heap (Priority Queue)',
     difficulty: 'Medium',
     description: 'Employs std::priority_queue min-heap for instant top K element tracking.',
@@ -399,7 +399,7 @@ TreeNode* searchBST(TreeNode* root, int val) {
   },
   {
     id: 'trie',
-    title: 'Trie (Prefix Tree Insert & Search)',
+    title: 'Trie',
     category: 'Trie',
     difficulty: 'Medium',
     description: 'Tree structure optimized for string insertion, search, and prefix matching.',
@@ -435,7 +435,7 @@ public:
   },
   {
     id: 'graphs',
-    title: 'Graphs (Dijkstra\'s Shortest Path)',
+    title: 'Graphs',
     category: 'Graphs',
     difficulty: 'Hard',
     description: 'Calculates shortest distance from source on non-negative weighted graphs.',
@@ -465,7 +465,7 @@ public:
   },
   {
     id: 'greedy',
-    title: 'Greedy Algorithms (Activity Selection)',
+    title: 'Greedy Algorithms',
     category: 'Greedy Algorithms',
     difficulty: 'Medium',
     description: 'Selects max non-overlapping activities by greedy finish time sorting.',
@@ -491,7 +491,7 @@ int maxActivities(vector<Activity>& activities) {
   },
   {
     id: 'backtracking',
-    title: 'Backtracking (Subsets / Power Set)',
+    title: 'Backtracking',
     category: 'Backtracking',
     difficulty: 'Medium',
     description: 'Explores decisions by systematically building and undoing solution state vectors.',
@@ -517,7 +517,7 @@ vector<vector<int>> subsets(vector<int>& nums) {
   },
   {
     id: 'dynamic-programming',
-    title: 'Dynamic Programming (0/1 Knapsack Tabulation)',
+    title: 'Dynamic Programming (DP)',
     category: 'Dynamic Programming (DP)',
     difficulty: 'Hard',
     description: 'Solves the classic knapsack capacity problem using bottom-up DP matrix.',
@@ -541,7 +541,7 @@ vector<vector<int>> subsets(vector<int>& nums) {
   },
   {
     id: 'segment-tree',
-    title: 'Segment Tree (Point Update & Range Query)',
+    title: 'Segment Tree',
     category: 'Segment Tree',
     difficulty: 'Hard',
     description: 'Tree structure supporting logarithmic point updates and range aggregation queries.',
@@ -575,7 +575,7 @@ public:
   },
   {
     id: 'fenwick-tree',
-    title: 'Fenwick Tree (Binary Indexed Tree - BIT)',
+    title: 'Fenwick Tree (Binary Indexed Tree)',
     category: 'Fenwick Tree (Binary Indexed Tree)',
     difficulty: 'Hard',
     description: 'Bitwise LSB indexed array structure for efficient prefix sum calculations.',
@@ -604,7 +604,7 @@ public:
   },
   {
     id: 'dsu',
-    title: 'Disjoint Set Union (DSU with Path Compression)',
+    title: 'Disjoint Set Union (DSU)',
     category: 'Disjoint Set Union (DSU)',
     difficulty: 'Medium',
     description: 'Manages dynamic set partitioning with near O(1) amortized inverse Ackermann time.',
