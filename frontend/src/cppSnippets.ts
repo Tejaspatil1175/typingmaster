@@ -1,3 +1,5 @@
+import { arrayQuestions } from './arrayQuestions';
+
 export interface CppSnippet {
   id: string;
   title: string;
@@ -11,13 +13,13 @@ export interface CppSnippet {
   code: string;
 }
 
-export const cppSnippets: CppSnippet[] = [
+const baseSnippets: CppSnippet[] = [
   {
     id: 'arrays',
     title: 'Arrays',
     category: 'Arrays',
     difficulty: 'Easy',
-    description: 'Reverses an array of integers in-place using two-pointer swapping.',
+    description: '10 essential Array interview questions with explanations and full runnable code.',
     complexity: {
       time: 'O(N)',
       space: 'O(1)'
@@ -754,3 +756,19 @@ int main() {
 }`
   }
 ];
+
+// Convert arrayQuestions to CppSnippet format so TypingSimulator can load them seamlessly
+const questionSnippets: CppSnippet[] = arrayQuestions.map((q) => ({
+  id: q.id,
+  title: q.title,
+  category: 'Arrays',
+  difficulty: q.difficulty,
+  description: q.problemStatement,
+  complexity: {
+    time: q.timeComplexity,
+    space: q.spaceComplexity
+  },
+  code: q.code
+}));
+
+export const cppSnippets: CppSnippet[] = [...baseSnippets, ...questionSnippets];

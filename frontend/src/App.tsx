@@ -1,21 +1,28 @@
 import { useState, useMemo } from 'react';
 import { TypingSimulator } from './components/TypingSimulator';
+import { ArrayQuestionsView } from './components/ArrayQuestionsView';
 import { cppSnippets } from './cppSnippets';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'practice'>('home');
+  const [viewingArrayQuestions, setViewingArrayQuestions] = useState<boolean>(false);
   const [selectedSnippetId, setSelectedSnippetId] = useState<string>('arrays');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
-  const categories = useMemo(() => {
-    const set = new Set<string>();
-    cppSnippets.forEach((s) => set.add(s.category));
-    return ['All', ...Array.from(set)];
+  // Filter out question-specific snippets from main module grid
+  const mainModules = useMemo(() => {
+    return cppSnippets.filter(s => !s.id.startsWith('q'));
   }, []);
 
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    mainModules.forEach((s) => set.add(s.category));
+    return ['All', ...Array.from(set)];
+  }, [mainModules]);
+
   const filteredSnippets = useMemo(() => {
-    return cppSnippets.filter((snippet) => {
+    return mainModules.filter((snippet) => {
       const matchesSearch =
         snippet.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         snippet.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -23,10 +30,11 @@ function App() {
       const matchesCategory = selectedCategory === 'All' || snippet.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [searchQuery, selectedCategory]);
+  }, [mainModules, searchQuery, selectedCategory]);
 
   const navigateToSection = (sectionId: string) => {
     setCurrentPage('home');
+    setViewingArrayQuestions(false);
     setTimeout(() => {
       const el = document.getElementById(sectionId);
       if (el) {
@@ -39,7 +47,7 @@ function App() {
     <div className="app-root-container">
       {/* Floating Navbar */}
       <nav className="navbar">
-        <div className="nav-brand" onClick={() => setCurrentPage('home')} style={{ cursor: 'pointer' }}>
+        <div className="nav-brand" onClick={() => { setCurrentPage('home'); setViewingArrayQuestions(false); }} style={{ cursor: 'pointer' }}>
           <span>TypeDSA.cpp</span>
           <span className="brand-count-badge">25 DSA Modules</span>
         </div>
@@ -88,7 +96,7 @@ function App() {
 
       {currentPage === 'home' ? (
         <>
-          {/* Hero Section with Split Layout: Text on Left, Live Array Simulator on Right */}
+          {/* Hero Section with Split Layout */}
           <header className="hero-section hero-split-layout">
             <div className="hero-left-content">
               <div className="hero-badge-container">
@@ -107,19 +115,19 @@ function App() {
               <div className="hero-feature-tags">
                 <span className="hero-tag-item">⚡ Real-Time WPM & Accuracy</span>
                 <span className="hero-tag-item">🧠 25 Runnable C++ Programs</span>
-                <span className="hero-tag-item">🎯 Kinetic Memory Building</span>
+                <span className="hero-tag-item">🎯 10 Curated Array Questions</span>
               </div>
 
               <div className="hero-btn-group">
                 <button
                   onClick={() => {
                     setCurrentPage('practice');
-                    setSelectedSnippetId('arrays');
+                    setViewingArrayQuestions(true);
                     window.scrollTo({ top: 0, behavior: 'auto' });
                   }}
                   className="btn-hero-cta"
                 >
-                  Start Typing Practice →
+                  Explore Array Questions (10) →
                 </button>
                 <button
                   onClick={() => {
@@ -213,8 +221,13 @@ function App() {
             </div>
           </section>
         </>
+      ) : viewingArrayQuestions ? (
+        /* Array 10 Questions View */
+        <main className="practice-page-container">
+          <ArrayQuestionsView onBackToModules={() => setViewingArrayQuestions(false)} />
+        </main>
       ) : (
-        /* Practice Page */
+        /* Main Practice Arena Page */
         <main className="practice-page-container">
           <div className="practice-header">
             <h1 className="practice-title">DSA Practice Arena</h1>
@@ -252,8 +265,13 @@ function App() {
                 key={snippet.id}
                 className={`topic-card ${selectedSnippetId === snippet.id ? 'active' : ''}`}
                 onClick={() => {
-                  setSelectedSnippetId(snippet.id);
-                  document.getElementById('simulator-anchor')?.scrollIntoView({ behavior: 'smooth' });
+                  if (snippet.id === 'arrays') {
+                    setViewingArrayQuestions(true);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  } else {
+                    setSelectedSnippetId(snippet.id);
+                    document.getElementById('simulator-anchor')?.scrollIntoView({ behavior: 'smooth' });
+                  }
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -264,10 +282,16 @@ function App() {
                 </div>
                 <h4>{snippet.title}</h4>
                 <p>{snippet.description}</p>
-                <div className="card-complexity-footer">
-                  <span>⚡ {snippet.complexity.time}</span>
-                  <span>💾 {snippet.complexity.space}</span>
-                </div>
+                {snippet.id === 'arrays' ? (
+                  <div className="arrays-special-badge">
+                    🔥 10 Practice Questions Available → Click to View
+                  </div>
+                ) : (
+                  <div className="card-complexity-footer">
+                    <span>⚡ {snippet.complexity.time}</span>
+                    <span>💾 {snippet.complexity.space}</span>
+                  </div>
+                )}
               </div>
             ))}
           </div>
