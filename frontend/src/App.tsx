@@ -217,12 +217,6 @@ function App() {
         /* Practice Page */
         <main className="practice-page-container">
           <div className="practice-header">
-            <button
-              onClick={() => setCurrentPage('home')}
-              className="btn-back"
-            >
-              ← Back to Home
-            </button>
             <h1 className="practice-title">DSA Practice Arena</h1>
             <p className="practice-subtitle">
               Select any of the 25 standard C++ data structure & algorithm cards below to launch it inside the typing visualizer.
