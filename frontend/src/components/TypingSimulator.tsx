@@ -2,31 +2,11 @@ import { useState, useEffect, useRef } from 'react';
 import { cppSnippets } from '../cppSnippets';
 
 interface TypingSimulatorProps {
-  selectedCategory?: string;
+  selectedSnippetId?: string;
 }
 
-export const TypingSimulator = ({ selectedCategory = 'all' }: TypingSimulatorProps) => {
-  // Filter snippets based on selected category
-  const filteredSnippets = cppSnippets.filter(s => {
-    if (selectedCategory === 'all') return true;
-    if (selectedCategory === 'arrays') return s.category === 'Algorithms' || s.category === 'Sorting';
-    if (selectedCategory === 'lists') return s.category === 'Data Structures';
-    if (selectedCategory === 'graphs') return s.category === 'Graphs';
-    return false;
-  });
-
-  const fallbackSnippet = {
-    id: 'placeholder',
-    title: 'No Snippets Available',
-    category: 'Status',
-    difficulty: 'Easy' as const,
-    description: 'We are working on adding C++ templates for this topic. Check back soon!',
-    complexity: { time: 'N/A', space: 'N/A' },
-    code: '// Snippets coming soon! Stay tuned.'
-  };
-
-  const [snippetIndex, setSnippetIndex] = useState(0);
-  const snippet = filteredSnippets[snippetIndex] || fallbackSnippet;
+export const TypingSimulator = ({ selectedSnippetId = 'binary-search' }: TypingSimulatorProps) => {
+  const snippet = cppSnippets.find(s => s.id === selectedSnippetId) || cppSnippets[0];
 
   const [input, setInput] = useState('');
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -40,15 +20,10 @@ export const TypingSimulator = ({ selectedCategory = 'all' }: TypingSimulatorPro
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Reset when snippet or category changes
+  // Reset when selected snippet changes
   useEffect(() => {
     resetSimulator();
-  }, [snippetIndex]);
-
-  useEffect(() => {
-    setSnippetIndex(0);
-    resetSimulator();
-  }, [selectedCategory]);
+  }, [selectedSnippetId]);
 
   // Handle timer
   useEffect(() => {
@@ -178,28 +153,8 @@ export const TypingSimulator = ({ selectedCategory = 'all' }: TypingSimulatorPro
 
   return (
     <div className="typing-simulator-container">
-      {/* Top Controls: Snippet Selector and Info */}
-      <div className="simulator-controls">
-        <div className="snippet-selector">
-          <label htmlFor="snippet-select">Choose DSA Snippet:</label>
-          <select
-            id="snippet-select"
-            value={snippetIndex}
-            onChange={(e) => setSnippetIndex(Number(e.target.value))}
-            className="select-dropdown"
-          >
-            {filteredSnippets.length === 0 ? (
-              <option value={0}>Coming Soon</option>
-            ) : (
-              filteredSnippets.map((s, idx) => (
-                <option key={s.id} value={idx}>
-                  {s.category} — {s.title} ({s.difficulty})
-                </option>
-              ))
-            )}
-          </select>
-        </div>
-
+      {/* Top Controls: Info & Complexity */}
+      <div className="simulator-controls" style={{ justifyContent: 'flex-end' }}>
         {/* Complexity badges */}
         <div className="snippet-complexity">
           <span className="complexity-badge time">

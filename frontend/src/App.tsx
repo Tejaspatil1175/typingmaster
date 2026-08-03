@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { TypingSimulator } from './components/TypingSimulator';
+import { cppSnippets } from './cppSnippets';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'practice'>('home');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedSnippetId, setSelectedSnippetId] = useState<string>('binary-search');
 
   const navigateToSection = (sectionId: string) => {
     setCurrentPage('home');
@@ -83,7 +84,7 @@ function App() {
               <button 
                 onClick={() => {
                   setCurrentPage('practice');
-                  setSelectedCategory('all');
+                  setSelectedSnippetId('binary-search');
                   window.scrollTo({ top: 0, behavior: 'auto' });
                 }} 
                 className="btn-hero-cta"
@@ -195,46 +196,36 @@ function App() {
               ← Back to Home
             </button>
             <h1 className="practice-title">DSA Practice Arena</h1>
-            <p className="practice-subtitle">Select a topic category below, choose a code snippet, and master C++ DSA syntax through speed-typing.</p>
+            <p className="practice-subtitle">Choose any standard C++ algorithm card below to launch it inside the interactive typing speed visualizer.</p>
           </div>
 
-          {/* Category Selection Cards */}
+          {/* Expanded List of DSA Selector Cards */}
           <div className="topic-cards-grid">
-            <div 
-              className={`topic-card ${selectedCategory === 'all' ? 'active' : ''}`}
-              onClick={() => setSelectedCategory('all')}
-            >
-              <span className="topic-icon">🌐</span>
-              <h4>Show All</h4>
-              <p>View all available algorithms and structural code snippets</p>
-            </div>
-            <div 
-              className={`topic-card ${selectedCategory === 'arrays' ? 'active' : ''}`}
-              onClick={() => setSelectedCategory('arrays')}
-            >
-              <span className="topic-icon">📊</span>
-              <h4>Array Patterns</h4>
-              <p>Search, Sort, and sequence manipulation algorithms</p>
-            </div>
-            <div 
-              className={`topic-card ${selectedCategory === 'lists' ? 'active' : ''}`}
-              onClick={() => setSelectedCategory('lists')}
-            >
-              <span className="topic-icon">🔗</span>
-              <h4>Linked Lists</h4>
-              <p>Reversals, node swapping, and pointer manipulation</p>
-            </div>
-            <div 
-              className={`topic-card ${selectedCategory === 'graphs' ? 'active' : ''}`}
-              onClick={() => setSelectedCategory('graphs')}
-            >
-              <span className="topic-icon">🌿</span>
-              <h4>Trees & Graphs</h4>
-              <p>Depth First Search, BFS, and graph representations</p>
-            </div>
+            {cppSnippets.map((snippet) => (
+              <div 
+                key={snippet.id}
+                className={`topic-card ${selectedSnippetId === snippet.id ? 'active' : ''}`}
+                onClick={() => {
+                  setSelectedSnippetId(snippet.id);
+                  // Optional scroll to the simulator when selecting a card on mobile
+                  document.getElementById('simulator-anchor')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span className="topic-category-badge">{snippet.category}</span>
+                  <span className={`difficulty-badge-pill ${snippet.difficulty.toLowerCase()}`}>
+                    {snippet.difficulty}
+                  </span>
+                </div>
+                <h4>{snippet.title}</h4>
+                <p>{snippet.description}</p>
+              </div>
+            ))}
           </div>
           
-          <TypingSimulator selectedCategory={selectedCategory} />
+          <div id="simulator-anchor" style={{ width: '100%' }}>
+            <TypingSimulator selectedSnippetId={selectedSnippetId} />
+          </div>
         </main>
       )}
 
