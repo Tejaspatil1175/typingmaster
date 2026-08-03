@@ -6,13 +6,13 @@ import { cppSnippets } from './cppSnippets';
 function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'practice'>('home');
   const [viewingArrayQuestions, setViewingArrayQuestions] = useState<boolean>(false);
-  const [selectedSnippetId, setSelectedSnippetId] = useState<string>('arrays');
+  const [selectedSnippetId, setSelectedSnippetId] = useState<string>('strings');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
   // Filter out question-specific snippets from main module grid
   const mainModules = useMemo(() => {
-    return cppSnippets.filter(s => !s.id.startsWith('q'));
+    return cppSnippets.filter((s) => !s.id.startsWith('q'));
   }, []);
 
   const categories = useMemo(() => {
@@ -47,22 +47,34 @@ function App() {
     <div className="app-root-container">
       {/* Floating Navbar */}
       <nav className="navbar">
-        <div className="nav-brand" onClick={() => { setCurrentPage('home'); setViewingArrayQuestions(false); }} style={{ cursor: 'pointer' }}>
+        <div
+          className="nav-brand"
+          onClick={() => {
+            setCurrentPage('home');
+            setViewingArrayQuestions(false);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          style={{ cursor: 'pointer' }}
+        >
           <span>TypeDSA.cpp</span>
           <span className="brand-count-badge">25 DSA Modules</span>
         </div>
         <div className="nav-links">
-          <a
-            href="#practice"
-            className={`nav-link ${currentPage === 'practice' ? 'active' : ''}`}
-            onClick={(e) => {
-              e.preventDefault();
+          <button
+            className={`nav-link-btn ${currentPage === 'practice' && !viewingArrayQuestions ? 'active' : ''}`}
+            onClick={() => {
               setCurrentPage('practice');
+              setViewingArrayQuestions(false);
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
           >
             Practice Arena
-          </a>
+          </button>
+          {viewingArrayQuestions && (
+            <button className="nav-link-btn active">
+              10 Array Questions
+            </button>
+          )}
           <a
             href="#advantages"
             className="nav-link"
@@ -94,7 +106,12 @@ function App() {
         </div>
       </nav>
 
-      {currentPage === 'home' ? (
+      {viewingArrayQuestions ? (
+        /* Array 10 Questions Dedicated Page */
+        <main className="practice-page-container">
+          <ArrayQuestionsView onBackToModules={() => setViewingArrayQuestions(false)} />
+        </main>
+      ) : currentPage === 'home' ? (
         <>
           {/* Hero Section with Split Layout */}
           <header className="hero-section hero-split-layout">
@@ -141,7 +158,7 @@ function App() {
             </div>
 
             <div className="hero-right-simulator">
-              <TypingSimulator selectedSnippetId="arrays" isCompact={true} />
+              <TypingSimulator selectedSnippetId="strings" isCompact={true} />
             </div>
           </header>
 
@@ -221,11 +238,6 @@ function App() {
             </div>
           </section>
         </>
-      ) : viewingArrayQuestions ? (
-        /* Array 10 Questions View */
-        <main className="practice-page-container">
-          <ArrayQuestionsView onBackToModules={() => setViewingArrayQuestions(false)} />
-        </main>
       ) : (
         /* Main Practice Arena Page */
         <main className="practice-page-container">
@@ -263,9 +275,10 @@ function App() {
             {filteredSnippets.map((snippet) => (
               <div
                 key={snippet.id}
-                className={`topic-card ${selectedSnippetId === snippet.id ? 'active' : ''}`}
+                className={`topic-card ${snippet.id === 'arrays' ? 'arrays-card-highlight' : selectedSnippetId === snippet.id ? 'active' : ''}`}
                 onClick={() => {
                   if (snippet.id === 'arrays') {
+                    setCurrentPage('practice');
                     setViewingArrayQuestions(true);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   } else {
@@ -284,7 +297,7 @@ function App() {
                 <p>{snippet.description}</p>
                 {snippet.id === 'arrays' ? (
                   <div className="arrays-special-badge">
-                    🔥 10 Practice Questions Available → Click to View
+                    🔥 Click to Open 10 Array Question Cards →
                   </div>
                 ) : (
                   <div className="card-complexity-footer">
@@ -296,7 +309,7 @@ function App() {
             ))}
           </div>
 
-          {/* Simulator Anchor */}
+          {/* Simulator Anchor for Non-Array Modules */}
           <div id="simulator-anchor" style={{ width: '100%' }}>
             <TypingSimulator selectedSnippetId={selectedSnippetId} />
           </div>
