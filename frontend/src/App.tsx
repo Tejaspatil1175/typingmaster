@@ -1,331 +1,598 @@
-import { useState, useMemo } from 'react';
-import { TypingSimulator } from './components/TypingSimulator';
-import { ArrayQuestionsView } from './components/ArrayQuestionsView';
-import { cppSnippets } from './cppSnippets';
+import { useState, useEffect, useMemo } from 'react';
+import { dsaQuestions, TOPICS, type DSAQuestion, type TopicInfo } from './dsaQuestions';
+import { PracticeTimer } from './components/PracticeTimer';
+import { QuestionDetailModal } from './components/QuestionDetailModal';
 
-function App() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'practice'>('home');
-  const [viewingArrayQuestions, setViewingArrayQuestions] = useState<boolean>(false);
-  const [selectedSnippetId, setSelectedSnippetId] = useState<string>('strings');
+type TopicId = 'all' | 'arrays' | 'strings' | 'linked-list' | 'stack' | 'queue' | 'binary-tree' | 'bst';
+type DifficultyFilter = 'All' | 'Easy' | 'Medium' | 'Hard';
+type StatusFilter = 'All' | 'Unsolved' | 'Solved' | 'Starred';
+
+export default function App() {
+  const [selectedTopic, setSelectedTopic] = useState<TopicId>('arrays');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>('All');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('All');
+  const [activeModalQuestion, setActiveModalQuestion] = useState<DSAQuestion | null>(null);
+  const [timerQuestion, setTimerQuestion] = useState<DSAQuestion | null>(null);
+  const [showTipsBanner, setShowTipsBanner] = useState<boolean>(true);
 
-  // Filter out question-specific snippets from main module grid
-  const mainModules = useMemo(() => {
-    return cppSnippets.filter((s) => !s.id.startsWith('q'));
-  }, []);
+  // Persistent storage for solved, starred, and notes
+  const [solvedIds, setSolvedIds] = useState<Set<string>>(() => {
+    try {
+      const saved = localStorage.getItem('dsa_solved_ids');
+      return saved ? new Set(JSON.parse(saved)) : new Set<string>();
+    } catch {
+      return new Set<string>();
+    }
+  });
 
-  const categories = useMemo(() => {
-    const set = new Set<string>();
-    mainModules.forEach((s) => set.add(s.category));
-    return ['All', ...Array.from(set)];
-  }, [mainModules]);
+  const [starredIds, setStarredIds] = useState<Set<string>>(() => {
+    try {
+      const saved = localStorage.getItem('dsa_starred_ids');
+      return saved ? new Set(JSON.parse(saved)) : new Set<string>();
+    } catch {
+      return new Set<string>();
+    }
+  });
 
-  const filteredSnippets = useMemo(() => {
-    return mainModules.filter((snippet) => {
-      const matchesSearch =
-        snippet.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        snippet.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        snippet.description.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = selectedCategory === 'All' || snippet.category === selectedCategory;
-      return matchesSearch && matchesCategory;
+  const [notes, setNotes] = useState<Record<string, string>>(() => {
+    try {
+      const saved = localStorage.getItem('dsa_question_notes');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  // Save to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('dsa_solved_ids', JSON.stringify(Array.from(solvedIds)));
+    } catch {
+      // storage full or disabled
+    }
+  }, [solvedIds]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('dsa_starred_ids', JSON.stringify(Array.from(starredIds)));
+    } catch {
+      // storage full or disabled
+    }
+  }, [starredIds]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('dsa_question_notes', JSON.stringify(notes));
+    } catch {
+      // storage full or disabled
+    }
+  }, [notes]);
+
+  const toggleSolved = (id: string) => {
+    setSolvedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
     });
-  }, [mainModules, searchQuery, selectedCategory]);
+  };
 
-  const navigateToSection = (sectionId: string) => {
-    setCurrentPage('home');
-    setViewingArrayQuestions(false);
-    setTimeout(() => {
-      const el = document.getElementById(sectionId);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
+  const toggleStarred = (id: string) => {
+    setStarredIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleSaveNote = (id: string, noteText: string) => {
+    setNotes((prev) => ({
+      ...prev,
+      [id]: noteText
+    }));
+  };
+
+  const handleResetProgress = () => {
+    if (window.confirm('Are you sure you want to reset all solved status checkboxes? Your notes and bookmarks will remain saved.')) {
+      setSolvedIds(new Set());
+    }
+  };
+
+  // Filtered Questions
+  const filteredQuestions = useMemo(() => {
+    return dsaQuestions.filter((q) => {
+      // Topic filter
+      if (selectedTopic !== 'all' && q.topic !== selectedTopic) {
+        return false;
       }
-    }, 50);
+
+      // Search filter (number or title or tags)
+      if (searchQuery.trim()) {
+        const query = searchQuery.trim().toLowerCase();
+        const matchesLcNum = q.lcNumber.toString().includes(query);
+        const matchesTitle = q.title.toLowerCase().includes(query);
+        const matchesTopic = q.topicName.toLowerCase().includes(query);
+        if (!matchesLcNum && !matchesTitle && !matchesTopic) return false;
+      }
+
+      // Difficulty filter
+      if (difficultyFilter !== 'All' && q.difficulty !== difficultyFilter) {
+        return false;
+      }
+
+      // Status filter
+      if (statusFilter === 'Solved' && !solvedIds.has(q.id)) return false;
+      if (statusFilter === 'Unsolved' && solvedIds.has(q.id)) return false;
+      if (statusFilter === 'Starred' && !starredIds.has(q.id)) return false;
+
+      return true;
+    });
+  }, [selectedTopic, searchQuery, difficultyFilter, statusFilter, solvedIds, starredIds]);
+
+  // Overall Statistics
+  const totalCount = dsaQuestions.length;
+  const solvedCount = solvedIds.size;
+  const overallPercentage = Math.round((solvedCount / (totalCount || 1)) * 100);
+
+  const easySolved = dsaQuestions.filter((q) => q.difficulty === 'Easy' && solvedIds.has(q.id)).length;
+  const easyTotal = dsaQuestions.filter((q) => q.difficulty === 'Easy').length;
+
+  const medSolved = dsaQuestions.filter((q) => q.difficulty === 'Medium' && solvedIds.has(q.id)).length;
+  const medTotal = dsaQuestions.filter((q) => q.difficulty === 'Medium').length;
+
+  const hardSolved = dsaQuestions.filter((q) => q.difficulty === 'Hard' && solvedIds.has(q.id)).length;
+  const hardTotal = dsaQuestions.filter((q) => q.difficulty === 'Hard').length;
+
+  // Active Topic Details
+  const activeTopicInfo = useMemo(() => {
+    return TOPICS.find((t) => t.id === selectedTopic);
+  }, [selectedTopic]);
+
+  // Topic specific progress
+  const getTopicProgress = (topicId: TopicId) => {
+    const topicQuestions = dsaQuestions.filter((q) => q.topic === topicId);
+    const solved = topicQuestions.filter((q) => solvedIds.has(q.id)).length;
+    return { solved, total: topicQuestions.length };
+  };
+
+  const handlePickRandomUnsolved = () => {
+    const unsolvedInTopic = (selectedTopic === 'all'
+      ? dsaQuestions
+      : dsaQuestions.filter((q) => q.topic === selectedTopic)
+    ).filter((q) => !solvedIds.has(q.id));
+
+    if (unsolvedInTopic.length === 0) {
+      alert('Congratulations! You have solved all questions in this topic!');
+      return;
+    }
+
+    const randomQ = unsolvedInTopic[Math.floor(Math.random() * unsolvedInTopic.length)];
+    setActiveModalQuestion(randomQ);
   };
 
   return (
-    <div className="app-root-container">
-      {/* Floating Navbar */}
-      <nav className="navbar">
-        <div
-          className="nav-brand"
-          onClick={() => {
-            setCurrentPage('home');
-            setViewingArrayQuestions(false);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          style={{ cursor: 'pointer' }}
-        >
-          <span>TypeDSA.cpp</span>
-          <span className="brand-count-badge">25 DSA Modules</span>
+    <div className="sheet-root-container">
+      {/* Top Main Navigation Bar */}
+      <header className="sheet-navbar">
+        <div className="sheet-nav-brand">
+          <div className="brand-logo-glow">
+            <span className="brand-code-brackets">&lt;C++&gt;</span>
+          </div>
+          <div className="brand-text-col">
+            <h1 className="brand-title">C++ DSA Mastery Sheet</h1>
+            <p className="brand-tagline">LeetCode Questions • 20–30 min practice rule • Optimal STL Patterns</p>
+          </div>
         </div>
-        <div className="nav-links">
-          <a
-            href="#practice"
-            className={`nav-link ${currentPage === 'practice' ? 'active' : ''}`}
-            onClick={(e) => {
-              e.preventDefault();
-              setCurrentPage('practice');
-              setViewingArrayQuestions(false);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
+
+        {/* Global Progress Bar in Navbar */}
+        <div className="nav-stats-summary">
+          <div className="stat-pill-group">
+            <span className="diff-count-badge easy">Easy: {easySolved}/{easyTotal}</span>
+            <span className="diff-count-badge medium">Med: {medSolved}/{medTotal}</span>
+            <span className="diff-count-badge hard">Hard: {hardSolved}/{hardTotal}</span>
+          </div>
+
+          <div className="overall-progress-bar-wrapper">
+            <div className="progress-labels">
+              <span className="progress-main-count">{solvedCount} of {totalCount} Solved</span>
+              <span className="progress-main-percent">{overallPercentage}%</span>
+            </div>
+            <div className="progress-track-bg">
+              <div className="progress-fill-emerald" style={{ width: `${overallPercentage}%` }}></div>
+            </div>
+          </div>
+
+          <button
+            className="btn-reset-progress"
+            onClick={handleResetProgress}
+            title="Reset solved checkboxes"
           >
-            Practice Arena
-          </a>
+            Reset
+          </button>
+        </div>
+      </header>
+
+      {/* Main Single Page Content */}
+      <main className="sheet-main-content">
+        {/* Core C++ Best Practices & Rules Card */}
+        <section className="cpp-guidelines-banner">
+          <div className="banner-header-row">
+            <div className="banner-title-flex">
+              <span className="banner-icon-badge">⚡</span>
+              <div>
+                <h3 className="banner-title">C++ DSA Interview Guidelines & Rules</h3>
+                <p className="banner-subtitle">
+                  Work through each topic in order. Solve each problem yourself for 20 to 30 minutes before checking the editorial.
+                </p>
+              </div>
+            </div>
+            <button
+              className="btn-toggle-banner"
+              onClick={() => setShowTipsBanner(!showTipsBanner)}
+            >
+              {showTipsBanner ? 'Hide Tips ▲' : 'Show Tips ▼'}
+            </button>
+          </div>
+
+          {showTipsBanner && (
+            <div className="guidelines-grid">
+              <div className="guideline-card">
+                <div className="guide-icon">🥞</div>
+                <div className="guide-body">
+                  <h4>Containers & Splicing</h4>
+                  <p>
+                    Use <code>std::stack</code>, <code>std::queue</code>, and <code>std::deque</code> for standard containers.
+                    Use <code>std::list</code> only when you need O(1) splicing (e.g. LRU Cache).
+                  </p>
+                </div>
+              </div>
+
+              <div className="guideline-card">
+                <div className="guide-icon">🌳</div>
+                <div className="guide-body">
+                  <h4>Trees: Recursion & Explicit Stack</h4>
+                  <p>
+                    For trees, write the recursive version first, then the iterative one with an explicit stack to build deep understanding.
+                  </p>
+                </div>
+              </div>
+
+              <div className="guideline-card">
+                <div className="guide-icon">🛡️</div>
+                <div className="guide-body">
+                  <h4>Memory & Pointers</h4>
+                  <p>
+                    Free or avoid leaking nodes in linked-list and tree problems. Prefer <code>nullptr</code> checks over sentinel values.
+                  </p>
+                </div>
+              </div>
+
+              <div className="guideline-card highlight-rule">
+                <div className="guide-icon">⏱️</div>
+                <div className="guide-body">
+                  <h4>The 20–30 Minute Rule</h4>
+                  <p>
+                    Set the practice timer. Struggle constructively for 20–30 minutes before reviewing the optimal solution code.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* TOPIC SELECTOR TABS (Single Page Navigation) */}
+        <section className="topics-navigation-bar">
+          <div className="topics-scroll-flex">
+            {TOPICS.map((topic: TopicInfo) => {
+              const { solved, total } = getTopicProgress(topic.id);
+              const isComplete = total > 0 && solved === total;
+              const isSelected = selectedTopic === topic.id;
+
+              return (
+                <button
+                  key={topic.id}
+                  className={`topic-tab-btn ${isSelected ? 'active' : ''} ${isComplete ? 'completed' : ''}`}
+                  onClick={() => {
+                    setSelectedTopic(topic.id);
+                    setSearchQuery('');
+                  }}
+                >
+                  <span className="tab-icon">{topic.icon}</span>
+                  <span className="tab-name">{topic.name}</span>
+                  <span className={`tab-count-badge ${isComplete ? 'all-done' : ''}`}>
+                    {isComplete ? '✓' : `${solved}/${total}`}
+                  </span>
+                </button>
+              );
+            })}
+
+            {/* All Questions Tab */}
+            <button
+              className={`topic-tab-btn all-tab ${selectedTopic === 'all' ? 'active' : ''}`}
+              onClick={() => {
+                setSelectedTopic('all');
+                setSearchQuery('');
+              }}
+            >
+              <span className="tab-icon">📚</span>
+              <span className="tab-name">All Topics</span>
+              <span className="tab-count-badge">{solvedCount}/{totalCount}</span>
+            </button>
+          </div>
+        </section>
+
+        {/* ACTIVE TOPIC HEADER & TOOLBAR */}
+        <section className="active-topic-panel">
+          <div className="active-topic-info-bar">
+            <div className="topic-text-col">
+              <div className="topic-title-row">
+                <h2>
+                  {activeTopicInfo ? `${activeTopicInfo.icon} ${activeTopicInfo.name}` : '📚 All LeetCode Questions'}
+                </h2>
+                {activeTopicInfo && (
+                  <span className="topic-question-count">
+                    {dsaQuestions.filter((q) => q.topic === activeTopicInfo.id).length} Problems
+                  </span>
+                )}
+              </div>
+              <p className="topic-description">
+                {activeTopicInfo?.description || 'Browse and filter across all 125 curated C++ DSA LeetCode problems.'}
+              </p>
+            </div>
+
+            <div className="topic-action-buttons">
+              <button
+                className="btn-random-pick"
+                onClick={handlePickRandomUnsolved}
+                title="Pick a random unsolved problem in this category"
+              >
+                🎲 Pick Random Unsolved
+              </button>
+            </div>
+          </div>
+
+          {/* Search & Filter Toolbar */}
+          <div className="filter-toolbar">
+            {/* Search Input */}
+            <div className="search-input-box">
+              <span className="search-glass-icon">🔍</span>
+              <input
+                type="text"
+                placeholder="Search by LC number (e.g. 344, 206, 1) or problem name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="search-input"
+              />
+              {searchQuery && (
+                <button
+                  className="btn-clear-search"
+                  onClick={() => setSearchQuery('')}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Difficulty Filter */}
+            <div className="filter-pill-group">
+              <span className="filter-label">Difficulty:</span>
+              {(['All', 'Easy', 'Medium', 'Hard'] as DifficultyFilter[]).map((diff) => (
+                <button
+                  key={diff}
+                  className={`filter-pill-btn ${difficultyFilter === diff ? 'active' : ''} ${diff.toLowerCase()}`}
+                  onClick={() => setDifficultyFilter(diff)}
+                >
+                  {diff}
+                </button>
+              ))}
+            </div>
+
+            {/* Status Filter */}
+            <div className="filter-pill-group">
+              <span className="filter-label">Status:</span>
+              {(['All', 'Unsolved', 'Solved', 'Starred'] as StatusFilter[]).map((status) => (
+                <button
+                  key={status}
+                  className={`filter-pill-btn ${statusFilter === status ? 'active' : ''}`}
+                  onClick={() => setStatusFilter(status)}
+                >
+                  {status === 'Starred' ? '★ Starred' : status}
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* QUESTIONS TABLE / LIST */}
+        <section className="questions-section">
+          {filteredQuestions.length === 0 ? (
+            <div className="empty-results-box">
+              <span className="empty-icon">🔎</span>
+              <h3>No matching questions found</h3>
+              <p>Try clearing your search query or adjusting your filters.</p>
+              <button
+                className="btn-reset-filters"
+                onClick={() => {
+                  setSearchQuery('');
+                  setDifficultyFilter('All');
+                  setStatusFilter('All');
+                }}
+              >
+                Reset Filters
+              </button>
+            </div>
+          ) : (
+            <div className="questions-list-wrapper">
+              <div className="questions-table-header">
+                <span className="th-col th-status">Status</span>
+                <span className="th-col th-num">LC #</span>
+                <span className="th-col th-title">Problem Title</span>
+                <span className="th-col th-diff">Difficulty</span>
+                <span className="th-col th-complexity">Complexity</span>
+                <span className="th-col th-actions">Actions</span>
+              </div>
+
+              <div className="questions-rows-container">
+                {filteredQuestions.map((q) => {
+                  const isSolved = solvedIds.has(q.id);
+                  const isStarred = starredIds.has(q.id);
+                  const hasNote = Boolean(notes[q.id]?.trim());
+
+                  return (
+                    <div
+                      key={q.id}
+                      className={`question-row-item ${isSolved ? 'row-solved' : ''} ${isStarred ? 'row-starred' : ''}`}
+                    >
+                      {/* Checkbox */}
+                      <div className="col-cell col-status">
+                        <label className="checkbox-custom-container" title={isSolved ? 'Mark as Unsolved' : 'Mark as Solved'}>
+                          <input
+                            type="checkbox"
+                            checked={isSolved}
+                            onChange={() => toggleSolved(q.id)}
+                          />
+                          <span className="checkbox-checkmark"></span>
+                        </label>
+                      </div>
+
+                      {/* LeetCode Number */}
+                      <div className="col-cell col-num">
+                        <span className="lc-number-tag">#{q.lcNumber}</span>
+                      </div>
+
+                      {/* Problem Title & Topic Badge */}
+                      <div className="col-cell col-title">
+                        <div className="title-row-flex">
+                          <button
+                            className="btn-title-link"
+                            onClick={() => setActiveModalQuestion(q)}
+                            title="Click to view Intuition & C++ Solution Code"
+                          >
+                            <span className="problem-title-text">{q.title}</span>
+                          </button>
+                          {selectedTopic === 'all' && (
+                            <span className="row-topic-pill">{q.topicName}</span>
+                          )}
+                          {hasNote && (
+                            <span className="row-note-indicator" title="You have saved notes for this question">
+                              📝
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Difficulty */}
+                      <div className="col-cell col-diff">
+                        <span className={`diff-pill ${q.difficulty.toLowerCase()}`}>
+                          {q.difficulty}
+                        </span>
+                      </div>
+
+                      {/* Complexity Badges */}
+                      <div className="col-cell col-complexity">
+                        <span className="comp-chip" title="Time Complexity">⚡ {q.timeComplexity}</span>
+                        <span className="comp-chip" title="Space Complexity">💾 {q.spaceComplexity}</span>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="col-cell col-actions">
+                        {/* Bookmark / Star */}
+                        <button
+                          className={`btn-row-star ${isStarred ? 'active' : ''}`}
+                          onClick={() => toggleStarred(q.id)}
+                          title={isStarred ? 'Remove Star' : 'Star this question'}
+                        >
+                          {isStarred ? '★' : '☆'}
+                        </button>
+
+                        {/* Start 25m Timer */}
+                        <button
+                          className="btn-row-timer"
+                          onClick={() => setTimerQuestion(q)}
+                          title="Start 20–30 min practice countdown for this problem"
+                        >
+                          ⏱️ Timer
+                        </button>
+
+                        {/* View Approach & C++ Code */}
+                        <button
+                          className="btn-row-solution"
+                          onClick={() => setActiveModalQuestion(q)}
+                          title="View Intuition, C++ Tip, and Solution Code"
+                        >
+                          💡 Code
+                        </button>
+
+                        {/* Open in LeetCode */}
+                        <a
+                          href={`https://leetcode.com/problems/${q.slug}/`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn-row-leetcode"
+                          title="Open on LeetCode.com (external tab)"
+                        >
+                          ↗
+                        </a>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </section>
+      </main>
+
+      {/* Floating 20–30 Min Practice Stopwatch / Timer */}
+      <PracticeTimer
+        activeQuestion={timerQuestion}
+        onClearActive={() => setTimerQuestion(null)}
+      />
+
+      {/* Question Details / Intuition / C++ Solution Modal */}
+      {activeModalQuestion && (
+        <QuestionDetailModal
+          question={activeModalQuestion}
+          isSolved={solvedIds.has(activeModalQuestion.id)}
+          isBookmarked={starredIds.has(activeModalQuestion.id)}
+          note={notes[activeModalQuestion.id] || ''}
+          onToggleSolved={toggleSolved}
+          onToggleBookmark={toggleStarred}
+          onSaveNote={handleSaveNote}
+          onStartTimer={(q) => {
+            setTimerQuestion(q);
+          }}
+          onClose={() => setActiveModalQuestion(null)}
+        />
+      )}
+
+      {/* Footer */}
+      <footer className="sheet-footer">
+        <div className="footer-left">
+          <p>© {new Date().getFullYear()} C++ DSA Mastery Sheet • 125 Curated LeetCode Problems</p>
+          <p className="footer-subtext">Follow the 20–30 min practice rule. Master containers, recursion, pointers, and trees.</p>
+        </div>
+        <div className="footer-right">
           <a
-            href="#advantages"
-            className="nav-link"
-            onClick={(e) => {
-              e.preventDefault();
-              navigateToSection('advantages');
-            }}
+            href="https://leetcode.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer-link"
           >
-            Advantages
-          </a>
-          <a
-            href="#curriculum"
-            className="nav-link"
-            onClick={(e) => {
-              e.preventDefault();
-              navigateToSection('curriculum');
-            }}
-          >
-            Curriculum
+            LeetCode ↗
           </a>
           <a
             href="https://github.com/Tejaspatil1175/typingmaster"
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-nav-cta"
+            className="footer-link"
           >
             GitHub
-          </a>
-        </div>
-      </nav>
-
-      {viewingArrayQuestions ? (
-        /* Array 10 Questions Dedicated Page */
-        <main className="practice-page-container">
-          <ArrayQuestionsView onBackToModules={() => setViewingArrayQuestions(false)} />
-        </main>
-      ) : currentPage === 'home' ? (
-        <>
-          {/* Hero Section with Split Layout */}
-          <header className="hero-section hero-split-layout">
-            <div className="hero-left-content">
-              <div className="hero-badge-container">
-                <span className="pulse-indicator"></span>
-                <span className="badge-tag-text">INTERACTIVE C++ CODING SIMULATOR</span>
-              </div>
-              <h1 className="hero-title">
-                Master 25 Core DSA Topics in C++ <br />
-                <span className="gradient-text-hero">at the Speed of Thought</span>
-              </h1>
-              <p className="hero-subtitle">
-                Passive reading won't help in time-pressured technical interviews. Build muscle memory for standard syntax, optimize your typing speed, and internalize C++ algorithms by active coding practice.
-              </p>
-
-              {/* Hero Feature Badges */}
-              <div className="hero-feature-tags">
-                <span className="hero-tag-item">⚡ Real-Time WPM & Accuracy</span>
-                <span className="hero-tag-item">🧠 25 Runnable C++ Programs</span>
-                <span className="hero-tag-item">🎯 10 Curated Array Questions</span>
-              </div>
-
-              <div className="hero-btn-group">
-                <button
-                  onClick={() => {
-                    setCurrentPage('practice');
-                    setViewingArrayQuestions(false);
-                    window.scrollTo({ top: 0, behavior: 'auto' });
-                  }}
-                  className="btn-hero-cta"
-                >
-                  Start Typing Practice →
-                </button>
-                <button
-                  onClick={() => {
-                    navigateToSection('curriculum');
-                  }}
-                  className="btn-hero-secondary"
-                >
-                  View 25 Modules
-                </button>
-              </div>
-            </div>
-
-            <div className="hero-right-simulator">
-              <TypingSimulator selectedSnippetId="strings" isCompact={true} />
-            </div>
-          </header>
-
-          {/* Advantages Section */}
-          <section id="advantages" style={{ padding: '60px 20px 40px' }}>
-            <h2 className="section-title">
-              Why Practice <span>DSA via Speed Typing</span>?
-            </h2>
-            <div className="advantages-grid">
-              <div className="advantage-card">
-                <div className="advantage-icon-wrapper">
-                  <span>🧠</span>
-                </div>
-                <h3>Syntax Autopilot</h3>
-                <p>
-                  Automate writing boilerplate code like <code>#include &lt;vector&gt;</code>,
-                  pointer allocations, iterators, and class templates. Free up your
-                  brain to focus on core algorithmic problem-solving.
-                </p>
-              </div>
-
-              <div className="advantage-card">
-                <div className="advantage-icon-wrapper">
-                  <span>⏱️</span>
-                </div>
-                <h3>Ace Coding Interviews</h3>
-                <p>
-                  In a 45-minute technical interview, typing speed is your secret superpower.
-                  Reduce your execution phase to 10 minutes so you have more time to explain,
-                  dry-run test-cases, and optimize complexity.
-                </p>
-              </div>
-
-              <div className="advantage-card">
-                <div className="advantage-icon-wrapper">
-                  <span>💾</span>
-                </div>
-                <h3>Kinetic Retention</h3>
-                <p>
-                  Kinetic memory (typing) keeps your brain actively engaged. Re-typing algorithms
-                  helps you memorize DFS, BFS, dynamic programming traversals, and tree mutations
-                  much faster than reading static slides.
-                </p>
-              </div>
-            </div>
-          </section>
-
-          {/* Curriculum Roadmap */}
-          <section id="curriculum" className="roadmap-section">
-            <h2 className="section-title">
-              The <span>25 C++ DSA Modules</span>
-            </h2>
-            <div className="roadmap-timeline">
-              <div className="roadmap-step">
-                <span className="step-num">Module 01</span>
-                <h4>Linear & Core Structures</h4>
-                <p>Arrays, Strings, Recursion, Sorting, Searching, Linked Lists, Stacks, Queues, and Deques.</p>
-              </div>
-
-              <div className="roadmap-step">
-                <span className="step-num">Module 02</span>
-                <h4>Algorithmic Techniques</h4>
-                <p>Hashing, Two Pointers, Sliding Window, Prefix Sum, and Bit Manipulation tricks.</p>
-              </div>
-
-              <div className="roadmap-step">
-                <span className="step-num">Module 03</span>
-                <h4>Trees & Graph Systems</h4>
-                <p>Binary Trees, BST, Heaps (Priority Queues), Tries, and Dijkstra's Shortest Path.</p>
-              </div>
-
-              <div className="roadmap-step">
-                <span className="step-num">Module 04</span>
-                <h4>Advanced Engineering</h4>
-                <p>Greedy, Backtracking, DP Tabulation, Segment Trees, Fenwick Trees, and DSU Disjoint Sets.</p>
-              </div>
-            </div>
-          </section>
-        </>
-      ) : (
-        /* Main Practice Arena Page */
-        <main className="practice-page-container">
-          <div className="practice-header">
-            <h1 className="practice-title">DSA Practice Arena</h1>
-            <p className="practice-subtitle">
-              Select any of the 25 standard C++ data structure & algorithm cards below to launch it inside the typing visualizer.
-            </p>
-          </div>
-
-          {/* Search & Category Filter Controls */}
-          <div className="arena-filter-controls">
-            <input
-              type="text"
-              className="arena-search-input"
-              placeholder="🔍 Search across 25 DSA topics (e.g. DP, Trie, Graph, Heap, Sorting...)"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <div className="category-pills">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  className={`pill-btn ${selectedCategory === cat ? 'active' : ''}`}
-                  onClick={() => setSelectedCategory(cat)}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* 25 Selector Cards Grid */}
-          <div className="topic-cards-grid">
-            {filteredSnippets.map((snippet) => (
-              <div
-                key={snippet.id}
-                className={`topic-card ${snippet.id === 'arrays' ? 'arrays-card-highlight' : selectedSnippetId === snippet.id ? 'active' : ''}`}
-                onClick={() => {
-                  if (snippet.id === 'arrays') {
-                    setCurrentPage('practice');
-                    setViewingArrayQuestions(true);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  } else {
-                    setSelectedSnippetId(snippet.id);
-                    document.getElementById('simulator-anchor')?.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span className="topic-category-badge">{snippet.category}</span>
-                  <span className={`difficulty-badge-pill ${snippet.difficulty.toLowerCase()}`}>
-                    {snippet.difficulty}
-                  </span>
-                </div>
-                <h4>{snippet.title}</h4>
-                <p>{snippet.description}</p>
-                {snippet.id === 'arrays' ? (
-                  <div className="arrays-special-badge">
-                    🔥 Click to Open 10 Array Question Cards →
-                  </div>
-                ) : (
-                  <div className="card-complexity-footer">
-                    <span>⚡ {snippet.complexity.time}</span>
-                    <span>💾 {snippet.complexity.space}</span>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Simulator Anchor for Non-Array Modules */}
-          <div id="simulator-anchor" style={{ width: '100%' }}>
-            <TypingSimulator selectedSnippetId={selectedSnippetId} />
-          </div>
-        </main>
-      )}
-
-      {/* Footer */}
-      <footer className="footer">
-        <div>
-          <p>© {new Date().getFullYear()} TypeDSA.cpp. 25 Essential C++ Algorithms & Data Structures.</p>
-        </div>
-        <div className="footer-links">
-          <a href="https://github.com/Tejaspatil1175/typingmaster" target="_blank" rel="noopener noreferrer">
-            GitHub Repository
           </a>
         </div>
       </footer>
     </div>
   );
 }
-
-export default App;
